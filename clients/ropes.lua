@@ -1,182 +1,130 @@
-ropes = {}
-randropes = {}
-ropethrowed = nil
+ropes_loaded = {}
 
-function attachRopeBetweenProps(playerPed, playerPos, rope)
-    local from = items[rope.from]
-    local fromPos = GetEntityCoords(from)
-    local to = items[rope.to]
-    local toPos = GetEntityCoords(to)
-    local ropeLength = (rope and rope.ropelength) or GetDistanceBetweenCoords(fromPos, toPos, true)
-    logger("Rope length: " .. ropeLength, "debug")
+function GetCoordsFromTo(from, to, config)
+    local fromBone = config and config.fromBone and GetPedBoneIndex(from, GetBoneIndexByName(config.fromBone)) or nil
+    logger(i18n("From bone index: %s", fromBone), "info")
+    local toBone = config and config.toBone and GetPedBoneIndex(to,GetBoneIndexByName(config.toBone)) or nil
+    logger(i18n("To bone index: %s", toBone), "info")
 
-    local maxRopeLength
-    if rope.maxRopeLength then
-        maxRopeLength = ropeLength
-    else
-        maxRopeLength = rope.max or 2.0
-    end
+    -- Obtenir les positions globales des entités
+    local fromPos = fromBone and GetWorldPositionOfEntityBone(from, fromBone) or GetEntityCoords(from)
+    logger(i18n("From position: %s", fromPos), "info")
+    local toPos = toBone and GetWorldPositionOfEntityBone(to, toBone) or GetEntityCoords(to)
+    logger(i18n("To position: %s", toPos), "info")
+    return fromPos, toPos
+end
 
-    ropeHandle = AddRope(
-        fromPos, -- Position initiale
-        vector3(0.0, 0.0, 0.0), -- Offset
-        maxRopeLength, -- Longueur maximale
-        rope.type or 4, -- Type de corde (4 = souple)
-        ropeLength, -- initLength : Longueur initiale de la corde
-        rope.min or 0.01, -- minLength : Longueur minimale que la corde peut atteindre
-        rope.rate or 1.0, -- lengthChangeRate : Vitesse d'enroulement/déroulement
-        false, -- onlyPPU : Inconnu, mettre false par défaut
-        rope.collision or false, -- collisionOn : Activer les collisions de la corde
-        rope.lock or false, -- lockFromFront : Si true, la corde devient rigide si maxLength est 0
-        rope.multiplier or 1.0, -- timeMultiplier : Multiplicateur de physique
-        rope.breakable or false, -- breakable : Permet de casser la corde par des tirs
-        0 -- unkPtr : Inconnu, toujours 0
-    )
-
-    if ropeHandle == nil then
-        logger("Rope not created", "warning")
-        return
-    end
-
-    if rope.fromOffset then
-        fromPos = vector3(fromPos.x + rope.fromOffset.x, fromPos.y + rope.fromOffset.y, fromPos.z + rope.fromOffset.z)
-    end
-
-    if rope.toOffset then
-        toPos = vector3(toPos.x + rope.toOffset.x, toPos.y + rope.toOffset.y, toPos.z + rope.toOffset.z)
-    end
-
-    AttachEntitiesToRope(
-        ropeHandle, -- Corde créée
-        from, to, -- Entités à attacher
-        fromPos, -- Point d'attachement 1
-        toPos -- Point d'attachement 2 ajusté pour la main gauche
-    )
-
-    -- Activer la physique et permettre à la corde de pendre naturellement
-    StartRopeUnwindingFront(ropeHandle) -- Permet de dérouler la corde
-    RopeForceLength(ropeHandle, ropeLength + 0.5) -- Ajuste la longueur avec une légère extension
-    ActivatePhysics(ropeHandle) -- Activer la physique sur la corde
+function StartRope(rope)
+    StartRopeUnwindingFront(rope) -- Permet de dérouler la corde
+    ActivatePhysics(rope) -- Activer la physique sur la corde
     RopeLoadTextures() -- Charger les textures de la corde
-
-    table.insert(randropes, ropeHandle)
-    return ropeHandle
 end
 
-function SpawnRopeFromTo(from, to, config)
-    local fromPos = GetEntityCoords(from)
-    local toPos = GetEntityCoords(to)
-    local ropeLength = (config and config.ropelength) or GetDistanceBetweenCoords(fromPos, toPos, true)
-    logger("Rope length: " .. ropeLength, "debug")
+function SpawnRope(from, to, config)
+    local fromPos, toPos = GetCoordsFromTo(from, to, config)
+    -- Calculer la distance entre les deux entités
+    local distanceCalc = #(fromPos - toPos)
+    logger(i18n("Rope distance: %s", distanceCalc), "info")
+    local distance = (config and config.distance) or distanceCalc
+    logger(i18n("Rope distance: %s", distance), "info")
+    local max_length = (config and config.maxLength) or distance
+    logger(i18n("Rope max length: %s", max_length), "info")
 
-    local maxRopeLength
-    if config and config.maxRopeLength then
-        maxRopeLength = ropeLength
-    else
-        maxRopeLength = (config and config.max) or 2.0
-    end
-
-    ropeHandle = AddRope(
-        fromPos, -- Position initiale
-        vector3(0.0, 0.0, 0.0), -- Offset
-        maxRopeLength, -- Longueur maximale
-        (config and config.type) or 1, -- Type de corde (4 = souple)
-        ropeLength, -- initLength : Longueur initiale de la corde
-        (config and config.min) or 0.01, -- minLength : Longueur minimale que la corde peut atteindre
-        (config and config.rate) or 1.0, -- lengthChangeRate : Vitesse d'enroulement/déroulement
-        false, -- onlyPPU : Inconnu, mettre false par défaut
-        (config and config.collision) or false, -- collisionOn : Activer les collisions de la corde
-        (config and config.lock) or false, -- lockFromFront : Si true, la corde devient rigide si maxLength est 0
-        (config and config.multiplier) or 1.0, -- timeMultiplier : Multiplicateur de physique
-        (config and config.breakable) or false, -- breakable : Permet de casser la corde par des tirs
-        0 -- unkPtr : Inconnu, toujours 0
+    -- Créer la corde
+    local rope = AddRope(
+        fromPos.x, fromPos.y, fromPos.z, -- Position initiale
+        (config and config.direction) or 0.0, 0.0, 0.0, -- Direction initiale
+        max_length, -- Longueur maximale
+        (config and config.ropeType) or 4, -- Type de corde
+        (config and config.initLength) or distance, -- Longueur initiale
+        (config and config.minLength) or 0.0, -- Longueur minimale
+        (config and config.lengthChangeRate) or 1.0, -- Taux d'enroulement
+        (config and config.onlyPPU) or false, -- Inconnu
+        (config and config.collisionOn) or false, -- Collision activée ?
+        (config and config.lockFromFront) or (max_length == 0), -- Rigide ?
+        (config and config.timeMultiplier) or 1.0, -- Multiplieur de physique
+        (config and config.breakable) or false, -- Corde cassable ?
+        (config and config.unkPtr) or 0 -- Inconnu
     )
 
-    if ropeHandle == nil then
-        logger("Rope not created", "warning")
+    if rope == nil then
+        logger(i18n("Rope not created"), "warning")
         return
-    end
-
-    if config and config.fromOffset then
-        fromPos = vector3(
-            fromPos.x + config.fromOffset.x,
-            fromPos.y + config.fromOffset.y,
-            fromPos.z + config.fromOffset.z
-        )
-    end
-
-    if config and config.toOffset then
-        toPos = vector3(
-            toPos.x + config.toOffset.x,
-            toPos.y + config.toOffset.y,
-            toPos.z + config.toOffset.z
-        )
-    end
-
-    AttachEntitiesToRope(
-        ropeHandle, -- Corde créée
-        from, to, -- Entités à attacher
-        fromPos, -- Point d'attachement 1
-        toPos -- Point d'attachement 2 ajusté pour la main gauche
-    )
-
-    -- Activer la physique et permettre à la corde de pendre naturellement
-    StartRopeUnwindingFront(ropeHandle) -- Permet de dérouler la corde
-    RopeForceLength(ropeHandle, ropeLength + 0.5) -- Ajuste la longueur avec une légère extension
-    ActivatePhysics(ropeHandle) -- Activer la physique sur la corde
-    RopeLoadTextures() -- Charger les textures de la corde
-
-    table.insert(randropes, ropeHandle)
-    return ropeHandle
-end
-
--- Fonction pour ajuster la longueur de la corde
-function adjustRopeLength(ropeId, newLength)
-    logger("Adjusting rope length: " .. newLength, "debug")
-    -- Si la longueur est valide, modifier la corde
-    if ropeId ~= nil then
-        RopeForceLength(ropeId, newLength)
-    end
-end
--- Fonction pour réduire la longueur de la corde
-function decreaseRope(ropeId)
-    newLength = GetRopeLength(ropeId) - 1.0
-    if newLength < 1.0 then newLength = 1.0 end
-    adjustRopeLength(ropeId, 1.0)
-end
-
--- Fonction pour augmenter la longueur de la corde
-function increaseRope(ropeId)
-    newLength = GetRopeLength(ropeId) + 1.0
-    adjustRopeLength(ropeId, 1.0)
-end
-
-function removeRopes(cfglist)
-    logger("Removing ropes", "debug")
-    if cfglist then
-        for _, key in ipairs(cfglist) do
-            if ropes[key] ~= nil and DoesRopeExist(ropes[key]) then
-                logger("Removing rope: " .. key, "debug")
-                logger("Rope: " .. ropes[key], "debug")
-                DeleteRope(ropes[key])
-            end
-        end
     else
-        for k, v in pairs(randropes) do
-            if v ~= nil and DoesRopeExist(v) then
-                logger("Removing rope: " .. k, "debug")
-                logger("Rope: " .. v, "debug")
-                DeleteRope(v)
-            end
-        end
-        randropes = {}
-        ropes = {}
+        logger(i18n("Rope created: %s", rope), "debug")
     end
+
+    table.insert(ropes_loaded, rope)
+    return rope, max_length, distance
 end
 
-function loadRopes(playerPed, playerPos, cfgropes)
-    logger("loadRopes", "debug")
-    for k, v in pairs(cfgropes) do
-        ropes[k] = attachRopeBetweenProps(playerPed, playerPos, v)
+function AttachRope(rope, from, to, config)
+    local fromPos = vector3(0.0, 0.0, 0.0)
+    local toPos = vector3(0.0, 0.0, 0.0)
+
+    if config.useCoords then
+        local gfromPos, gtoPos = GetCoordsFromTo(from, to, config)
+        if isEntityInTypes(from, {"object"}) then
+            fromPos = gfromPos
+        end
+        if isEntityInTypes(to, {"object"}) then
+            toPos = gtoPos
+        end
+    end
+
+    --if config.useCoords then
+    --    local gfromPos, gtoPos = GetCoordsFromTo(from, to, config)
+    --    if isEntityInTypes(from, {"vehicle", "ped"}) then
+    --        fromPos = gfromPos
+    --    end
+    --    if isEntityInTypes(to, {"vehicle", "ped"}) then
+    --        toPos = gtoPos
+    --    end
+    --end
+
+    if config.fromOffset then
+        fromPos = fromPos + config.fromOffset
+    end
+
+    if config.toOffset then
+        toPos = toPos + config.toOffset
+    end
+
+    local ropeLength = (config and config.ropeLength) or GetDistanceBetweenCoords(fromPos, toPos, true)
+
+    -- toPos = toPos + vector3(0.0, 0.0, 0.1)
+    AttachEntitiesToRope(
+        rope, -- Identifiant de la corde
+        from, -- Première entité
+        to, -- Seconde entité
+        fromPos, -- Point d'attachement 1
+        toPos, -- Point d'attachement 2 ajusté pour la main gauche
+        ropeLength,
+        (config and config.physic) or false, -- Physique activée
+        (config and config.collision) or false, -- Collision activée
+        (config and config.fromBone) or nil, -- Os de la première entité
+        (config and config.toBone) or nil -- Os de la seconde entité
+    )
+end
+
+function SpawnRopeAndAttach(from, to, config)
+    config = config or {}
+    local rope, maxLength, distance = SpawnRope(from, to, config)
+    config.ropeLength = distance
+
+    -- Attacher les entités à la corde
+    AttachRope(rope, from, to, config)
+    StartRope(rope)
+
+    return rope
+end
+
+function removeRopes(ropes)
+    for k, v in pairs(ropes) do
+        if v ~= nil and DoesRopeExist(v) then
+            logger("Removing rope: " .. k, "debug")
+            logger("Rope: " .. v, "debug")
+            DeleteRope(v)
+        end
     end
 end

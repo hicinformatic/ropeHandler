@@ -1,131 +1,87 @@
-items = {}
-randitems = {}
+items_loaded = {}
 
-function attachItemToPlayer(playerPed, playerPos, prop)
-    -- Charger le modèle
-    local model = prop.model
-    local modelhash = GetHashKey(prop.model)
-    local entityIndex = nil
-
-    RequestModel(modelhash)  -- Charger le modèle
-    while not HasModelLoaded(modelhash) do
+function getModel(model)
+    RequestModel(model)  -- Charger le modèle
+    while not HasModelLoaded(model) do
         Wait(500)  -- Attendre que le modèle soit chargé
     end
+    return GetHashKey(model)
+end
 
-    -- Créer l'objet et le placer juste devant le joueur
-    offset = (prop and prop.offset) or vector3(0.0, 0.0, 0.0)
-    rotation = (prop and prop.rotation) or vector3(0.0, 0.0, 0.0)
-    local entity
-    if prop.from then
-        local from = items[prop.from]
-        local fromPos = GetEntityCoords(from)
-        fromPos = vector3(fromPos.x + offset.x, fromPos.y + offset.y, fromPos.z + offset.z)
-        entity = CreateObject(modelhash, fromPos, true, true, false)
+function SpawnItem(item, config)
+    local ped = PlayerPedId()
+    local initPos
+
+    if config and config.bonePos then
+        local boneIndex = GetPedBoneIndex(ped, GetBoneIndexByName(config.bonePos))
+        initPos = GetWorldPositionOfEntityBone(ped, boneIndex)
     else
-        entity = CreateObject(modelhash, playerPos, true, true, false)
+        initPos = GetEntityCoords(ped)
     end
 
-    if prop.entity_rotation ~= nil then
-        SetEntityRotation(entity, prop.entity_rotation.x, prop.entity_rotation.y, prop.entity_rotation.z, 2, true)
+    if config and config.entityOffset then
+        initPos = initPos + config.entityOffset
     end
 
-    -- SetEntityCollision(entity, false, true)
-    SetEntityVisible(entity, prop.visible or false, prop.collision or false)
+    local modelhash = getModel(item)
+    local entity = CreateObject(
+        modelhash,
+        (config and config.axis) or initPos,
+        (config and config.isNetwork) or true,
+        (config and config.isPhysical) or true,
+        (config and config.doorFlag) or false
+    )
 
-    -- Attacher l'objet au joueur
-    -- if prop.rope ~= nil then
-        -- entityIndex = items[prop.rope]
-        -- local entitycoords = GetEntityCoords(entityIndex)
-        -- SetEntityCoords(entity, entitycoords.x + offset.x, entitycoords.y + offset.y, entitycoords.z + offset.z, true, true, true, true)
-    if prop.bone ~= nil then
-        logger("attach to bone: " .. prop.bone, "debug")
-        entityIndex = GetPedBoneIndex(playerPed, prop.bone)
-        AttachEntityToEntity(entity, playerPed, entityIndex, offset, rotation, true, true, false, true, 1, true)
-    elseif prop.prop ~= nil then
-        logger("attach to prop: " .. prop.prop, "debug")
-        entityIndex = items[prop.prop]
-        AttachEntityToEntity(entity, entityIndex, 0, offset, rotation, true, true, false, true, 1, true)
+    if config and config.entityRotation then
+         SetEntityRotation(entity, config.entityRotation, 2, true)
+     end
+
+    if config and config.noCollision then
+        SetEntityCompletelyDisableCollision(entity, false, true)
     end
 
-    if prop.bone ~= nil or prop.prop ~= nil then
-        SetModelAsNoLongerNeeded(modelhash)
+    if config and config.invisible then
+        SetEntityVisible(entity, false, false)
     end
 
-    table.insert(randitems, entity)
+    table.insert(items_loaded, entity)
+    SetModelAsNoLongerNeeded(modelhash)
     return entity
 end
 
-function SpawnItemAtBone(ped, bone, item, config)
-    local model = item.model
-    local modelhash = GetHashKey(model)
-
-    RequestModel(modelhash)  -- Charger le modèle
-    while not HasModelLoaded(modelhash) do
-        Wait(500)  -- Attendre que le modèle soit chargé
+function AttachItem(entity, to, config)
+    local boneIndex
+    if config and config.bone then
+        boneIndex = GetPedBoneIndex(to, GetBoneIndexByName(config.bone))
     end
 
-    local entity = CreateObject(modelhash, 0.0, 0.0, 0.0, true, true, false)
-    local entityIndex = GetPedBoneIndex(ped, bone)
-    AttachEntityToEntity(entity, ped, entityIndex,
+    AttachEntityToEntity(
+        entity,
+        to,
+        boneIndex,
         (config and config.offset) or vector3(0.0, 0.0, 0.0),
         (config and config.rotation) or vector3(0.0, 0.0, 0.0),
-        true, true, false, true, 1, true
+        (config and config.p9) or true,
+        (config and config.useSoftPinning) or true,
+        false,
+        IsEntityAPed(to) or (config and config.isPed) or true,
+        (config and config.rotationOrder) or 1,
+        (config and config.syncRot) or true
     )
-
-    SetModelAsNoLongerNeeded(modelhash)
-
-    table.insert(randitems, entity)
     return entity
 end
 
-function SpawnItemAtCoords(coords, item, config)
-    local model = item.model
-    local modelhash = GetHashKey(model)
-
-    RequestModel(modelhash)  -- Charger le modèle
-    while not HasModelLoaded(modelhash) do
-        Wait(500)  -- Attendre que le modèle soit chargé
-    end
-
-    local entity = CreateObject(modelhash, coords, true, true, false)
-    SetEntityCollision(entity,
-        (config and config.visible) or false,
-        (config and config.collision) or false
-    )
-
-    SetModelAsNoLongerNeeded(modelhash)
-
-    table.insert(randitems, entity)
+function SpawnItemAndAttach(item, to, config)
+    local entity = SpawnItem(item, config)
+    AttachItem(entity, to, config)
     return entity
 end
 
-function loadItems(playerPed, playerPos, cfgitems, cfgorders)
-    logger("Loading items")
-    for _, key in ipairs(cfgorders) do
-        logger("Loading item: " .. key, "debug")
-        local item = cfgitems[key]
-        items[key] = attachItemToPlayer(playerPed, playerPos, item)
-    end
-end
-
-function removeItems(cfglist)
-    if cfglist then
-        for _, key in ipairs(cfglist) do
-            if items[key] ~= nil and DoesEntityExist(items[key]) then
-                logger("Removing entity: " .. key, "debug")
-                logger("Entity: " .. items[key], "debug")
-                DeleteEntity(items[key])
-            end
+function removeItems(items)
+    for k, v in pairs(items) do
+        if v ~= nil and DoesEntityExist(v) then
+            logger("Removing entity: " .. v, "debug")
+            DeleteEntity(v)
         end
-    else
-        for k, v in pairs(randitems) do
-            if v ~= nil and DoesEntityExist(v) then
-                logger("Removing entity: " .. k, "debug")
-                logger("Entity: " .. v, "debug")
-                DeleteEntity(randitems[k])
-            end
-        end
-        randitems = {}
-        items = {}
     end
 end
