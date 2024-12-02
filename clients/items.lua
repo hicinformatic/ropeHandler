@@ -1,4 +1,5 @@
 items_loaded = {}
+items_named = {}
 
 function getModel(model)
     RequestModel(model)  -- Charger le modèle
@@ -12,7 +13,9 @@ function SpawnItem(item, config)
     local ped = PlayerPedId()
     local initPos
 
-    if config and config.bonePos then
+    if config and config.coords then
+        initPos = config.coords
+    elseif config and config.bonePos then
         local boneIndex = GetPedBoneIndex(ped, GetBoneIndexByName(config.bonePos))
         initPos = GetWorldPositionOfEntityBone(ped, boneIndex)
     else
@@ -32,9 +35,13 @@ function SpawnItem(item, config)
         (config and config.doorFlag) or false
     )
 
+    if config and config.entityFixed then
+        SetEntityCollision(entity, false, false)
+    end
+
     if config and config.entityRotation then
          SetEntityRotation(entity, config.entityRotation, 2, true)
-     end
+    end
 
     if config and config.noCollision then
         SetEntityCompletelyDisableCollision(entity, false, true)
@@ -45,6 +52,11 @@ function SpawnItem(item, config)
     end
 
     table.insert(items_loaded, entity)
+
+    if config and config.itemname then
+        items_named[config.itemname] = entity
+    end
+
     SetModelAsNoLongerNeeded(modelhash)
     return entity
 end

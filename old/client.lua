@@ -5,10 +5,10 @@ entity_attached = nil
 entity_type = nil
 
 local function help()
-    message("Usage: /ropehook [ropetype]", "info")
-    message("Available ropetypes:", "info")
+    chatmsg("Usage: /ropehook [ropetype]", "info")
+    chatmsg("Available ropetypes:", "info")
     for k, v in pairs(Config.RopeTypes) do
-        message("-- " .. v .. " --", "info")
+        chatmsg("-- " .. v .. " --", "info")
     end
 end
 

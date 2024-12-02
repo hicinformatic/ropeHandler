@@ -11,12 +11,12 @@ function lassoStart()
     -- Vérifier si le joueur a déjà un crochet et/ou une corde attaché
     if next(items) ~= nil then
         RopeHandlerStop()
-        message("Vous rangez votre lasso", "info")
+        chatmsg("Vous rangez votre lasso", "info")
         logger("Items removed", "debug")
     else
         loadItems(playerPed, playerPos, Config.Lasso.items, Config.Lasso.orders) -- Charger les objets
         loadRopes(playerPed, playerPos, Config.Lasso.ropes)  -- Charger les cordes
-        message("Vous sortez votre lasso", "info")
+        chatmsg("Vous sortez votre lasso", "info")
         logger("Items loaded", "debug")
     end
 
@@ -38,7 +38,7 @@ function lassoThread()
             DrawLineToTarget(coords)  -- Dessiner la ligne vers la cible
 
             if IsDisabledControlJustPressed(0, 24) then
-                message("Vous lancez le grappin", "info")
+                chatmsg("Vous lancez le grappin", "info")
                 PlayAnimation(PlayerPedId(), Config.Lasso.animations.throw, 1000)
                 lassoThrow(coords)
             end

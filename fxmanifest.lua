@@ -18,16 +18,17 @@ files {
 client_scripts {
     'i18n/fr.lua',
     'config.lua',
-    'help.lua',
+    'helpers.lua',
     'clients/aim.lua',
     'clients/animations.lua',
     'clients/items.lua',
     'clients/ropes.lua',
+    'clients/shift.lua',
+    'clients/ui.lua',
+    -- Ropes
     'ropes/grapplinghook/config.lua',
     'ropes/grapplinghook/init.lua',
-    'ropes/lasso/config.lua',
-    'ropes/lasso/init.lua',
-    'ui.lua',
-    'events.lua',
+    'ropes/spiderman/config.lua',
+    'ropes/spiderman/init.lua',
     'client.lua',
 }

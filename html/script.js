@@ -1,16 +1,16 @@
 let menuLoaded = false;
-let optionActive = false;
-let optionsEl = {};
+let ropeActive = false;
+let ropesEl = {};
 
 function activeOption(option) {
-    if (optionActive && optionsEl[optionActive]) {
-        optionsEl[optionActive].classList.remove("selected");
+    if (ropeActive && ropesEl[ropeActive]) {
+        ropesEl[ropeActive].classList.remove("selected");
     }
     if (option != "clean" && option != "close") {
-        optionActive = option;
-        optionsEl[option].classList.add("selected");
+        ropeActive = option;
+        ropesEl[option].classList.add("selected");
     } else {
-        optionActive = false;
+        ropeActive = false;
     }
 }
 
@@ -34,16 +34,23 @@ function loadLanguage(lang) {
     document.body.appendChild(script);
 }
 
-function loadMenu(options) {
+function loadMenu(ropes, commands) {
     var menu = document.getElementById("menu");
-    options.forEach((option) => {
-        console.log(option);
-        if (option.name != "ui") {
+    ropes.forEach((rope) => {
+        var button = document.createElement("button");
+        button.innerHTML = rope.lang;
+        button.onclick = () => selectOption(rope.name);
+        menu.appendChild(button);
+        ropesEl[rope.name] = button;
+    });
+    var separator = document.createElement("hr");
+    menu.appendChild(separator);
+    commands.forEach((command) => {
+        if(command.name != "ui") {
             var button = document.createElement("button");
-            button.innerHTML = option.lang
-            button.onclick = () => selectOption(option.name);
+            button.innerHTML = command.lang;
+            button.onclick = () => selectOption(command.name);
             menu.appendChild(button);
-            optionsEl[option.name] = button;
         }
     });
     menuLoaded = true;
@@ -55,9 +62,9 @@ window.addEventListener("message", (event) => {
     loadLanguage(data.lang);
     if (data.action === "openui") {
         if (!menuLoaded) {
-            loadMenu(data.options);
+            console.log(data.commands);
+            loadMenu(data.ropes, data.commands);
         }
-        console.log("active", data.active);
         if (data.active) {
             activeOption(data.active);
         }

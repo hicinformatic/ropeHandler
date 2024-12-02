@@ -1,60 +1,107 @@
-current_usage = nil
-rope_mode = nil
+current_usage = {
+    throwed = {},
+    mode = nil,
+}
+last_mode = nil
 
-is_rope_throwed_item = nil
-is_rope_throwed = false
-entity_attached = nil
-entity_type = nil
 
 local function help()
-    message(i18n("Usage: /ropehook [ropetype]"), "info")
-    message(i18n("Available ropetypes:"), "info")
+    chatmsg(i18n("Usage: /ropehook [ropetype]"), "info")
+    chatmsg(i18n("Available ropetypes:"), "info")
     for k, v in pairs(Config.Commands) do
-        message(i18n("%d. %s", k, v), "info")
+        chatmsg(i18n("%d. %s", k, v), "info")
     end
 end
 
-function RopeHandlerStop()
-    removeItems(items_loaded)
-    items_loaded = {}
-    removeRopes(ropes_loaded)
-    ropes_loaded = {}
-    current_usage = nil
-    rope_mode = nil
+local function PrepareUsage()
+    current_usage = {
+        throwed = {},
+        mode = nil,
+    }
 end
 
-function ropeHandlerStart(mode)
+local function CanStart(mode)
+    logger(i18n("CanStart: %s", mode), "debug")
+    logger(i18n("current_usage.mode: %s", current_usage.mode), "debug")
+    if current_usage.mode ~= nil and current_usage.mode == mode then
+        return false
+    end
+    return true
+end
+
+function IsThrowed()
+    return #current_usage.throwed > 0
+end
+
+function RopeHandlerStart(mode)
     logger(i18n("Command /ropehandler called: %s", mode), "debug")
-    if isStringInArray(Config.Commands, mode) then
+    if isStringInArray(Config.Ropes, mode) then
         logger(i18n("Rope type enabled: %s", mode), "debug")
-        current_usage = {mode = mode or args[1]}
+        if CanStart(mode) then
+            RopeHandlerStop()
+            current_usage = {mode = mode or args[1]}
+            last_mode = mode
+            logger(i18n("Current usage mode: %s", current_usage.mode), "debug")
+            _G[current_usage.mode .. "Init"]()
+        else
+            logger(i18n("Rope type already enabled: %s", mode), "debug")
+        end
+    elseif isStringInArray(Config.Commands, mode) then
+        logger(i18n("Command launched: %s", mode), "debug")
+        _G[mode .. "Init"]()
     else
         logger(i18n("Invalid ropetype: %s", mode), "debug")
         help()
         return
     end
-    _G[current_usage.mode .. "Init"]()
+end
+
+function RopeHandlerStop()
+    removeItems(items_loaded)
+    removeRopes(ropes_loaded)
+    items_loaded = {}
+    items_named = {}
+    ropes_loaded = {}
+    ropes_named = {}
+    PrepareUsage()
 end
 
 function RopeHandlerRestart()
-    local current_save = current_usage
     RopeHandlerStop()
-    current_usage = current_save
-    ropeHandlerStart()
+    RopeHandlerStart(last_mode)
 end
 
 RegisterCommand('ropehandler', function(source, args, rawCommand)
     setLang(Config.DefaultLang)
-    ropeHandlerStart(args[1] or "ui")
+    RopeHandlerStart(args[1] or "ui")
 end, false)
 
 Citizen.CreateThread(function()
      while true do
         Citizen.Wait(0)
-        if rope_mode and isStringInArray(Config.Commands, rope_mode) then
-            TriggerEvent('disableWeaponWheel', true)
-            _G[rope_mode .. "Thread"]()
-            TriggerEvent('disableWeaponWheel', false)
+        if current_usage.mode and isStringInArray(Config.Ropes, current_usage.mode) then
+            -- Enable the rope mode
+            _G[current_usage.mode .. "Thread"]()
         end
     end
+end)
+
+-- Supprimer l'objet lorsque le joueur quitte ou lorsque le script est arrêté
+AddEventHandler('onResourceStop', function(resourceName)
+    if resourceName == GetCurrentResourceName() then
+        logmsg("Resource stopped", "debug")
+        RopeHandlerStop()
+    end
+end)
+
+AddEventHandler('onResourceStart', function(resourceName)
+    if resourceName == GetCurrentResourceName() then
+        logmsg("Resource started", "debug")
+    end
+end)
+
+-- Optionnel : Supprimer l'objet lorsque le joueur quitte le serveur
+AddEventHandler('playerDropped', function()
+    logmsg("Resource stopped", "debug")
+    RopeHandlerStop()
 end)

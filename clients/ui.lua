@@ -1,8 +1,8 @@
 -- Callback pour gérer les options sélectionnées
 RegisterNUICallback("selectOption", function(data, cb)
-    print("Option sélectionnée : " .. data.option)
+    logger(i18n("Option selected : " .. data.option), "debug")
     closeInit()
-    ropeHandlerStart(data.option)
+    RopeHandlerStart(data.option)
     cb("ok")
 end)
 
@@ -18,28 +18,37 @@ end
 function uiInit()
     optslang = {
         grapplinghook = i18n("Grapplinghook"),
-        lasso = i18n("Lasso"),
+        spiderman = i18n("Spiderman"),
         user = i18n("User interface"),
         clean = i18n("Clean"),
         close = i18n("Close"),
         help = i18n("Help"),
     }
 
-    options = {}
-    for k, v in pairs(Config.Commands) do
-        options[k] = {
+    ropes = {}
+    for k, v in pairs(Config.Ropes) do
+        ropes[k] = {
             name = v,
             lang = optslang[v],
         }
     end
 
-    message("UI initialized", "debug")
-    message(Config.Commands, "debug")
+    commands = {}
+    for k, v in pairs(Config.Commands) do
+        commands[k] = {
+            name = v,
+            lang = optslang[v],
+        }
+    end
+
+    chatmsg("UI initialized", "debug")
+    chatmsg(Config.Commands, "debug")
     SetNuiFocus(true, true)
     SendNUIMessage({
         action = "openui",
-        options = options,
-        active = rope_mode,
+        ropes = ropes,
+        commands = commands,
+        active = current_usage.mode,
         lang = Config.DefaultLang,
     })
 end

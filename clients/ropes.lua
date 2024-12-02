@@ -1,4 +1,5 @@
 ropes_loaded = {}
+ropes_named = {}
 
 function GetCoordsFromTo(from, to, config)
     local fromBone = config and config.fromBone and GetPedBoneIndex(from, GetBoneIndexByName(config.fromBone)) or nil
@@ -55,6 +56,11 @@ function SpawnRope(from, to, config)
     end
 
     table.insert(ropes_loaded, rope)
+
+    if config and config.ropename then
+        ropes_named[config.ropename] = rope
+    end
+
     return rope, max_length, distance
 end
 
@@ -62,37 +68,31 @@ function AttachRope(rope, from, to, config)
     local fromPos = vector3(0.0, 0.0, 0.0)
     local toPos = vector3(0.0, 0.0, 0.0)
 
-    if config.useCoords then
+    if config and config.useCoords then
         local gfromPos, gtoPos = GetCoordsFromTo(from, to, config)
-        if isEntityInTypes(from, {"object"}) then
+        if isEntityInTypes(from, {"object", "coords"}) then
+            logger(i18n("Using coords for from entity"), "debug")
             fromPos = gfromPos
         end
-        if isEntityInTypes(to, {"object"}) then
+        if isEntityInTypes(to, {"object", "coords"}) then
+            logger(i18n("Using coords for to entity"), "debug")
             toPos = gtoPos
         end
     end
 
-    --if config.useCoords then
-    --    local gfromPos, gtoPos = GetCoordsFromTo(from, to, config)
-    --    if isEntityInTypes(from, {"vehicle", "ped"}) then
-    --        fromPos = gfromPos
-    --    end
-    --    if isEntityInTypes(to, {"vehicle", "ped"}) then
-    --        toPos = gtoPos
-    --    end
-    --end
-
-    if config.fromOffset then
+    if config and config.fromOffset then
+        logger(i18n("Offset from: %s", config.fromOffset), "debug")
         fromPos = fromPos + config.fromOffset
     end
 
-    if config.toOffset then
+    if config and config.toOffset then
+        logger(i18n("Offset to: %s", config.toOffset), "debug")
         toPos = toPos + config.toOffset
     end
 
     local ropeLength = (config and config.ropeLength) or GetDistanceBetweenCoords(fromPos, toPos, true)
+    logger(i18n("Rope length: %s", ropeLength), "debug")
 
-    -- toPos = toPos + vector3(0.0, 0.0, 0.1)
     AttachEntitiesToRope(
         rope, -- Identifiant de la corde
         from, -- Première entité
@@ -111,11 +111,8 @@ function SpawnRopeAndAttach(from, to, config)
     config = config or {}
     local rope, maxLength, distance = SpawnRope(from, to, config)
     config.ropeLength = distance
-
-    -- Attacher les entités à la corde
     AttachRope(rope, from, to, config)
     StartRope(rope)
-
     return rope
 end
 

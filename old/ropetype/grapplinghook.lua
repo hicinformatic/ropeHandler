@@ -19,7 +19,7 @@ local function grapplinghookThrow(coords, entity)
         entity_type = "coords"
     end
     -- is_rope_throwed = SpawnRopeFromTo(items["pelvis"], is_rope_throwed_item)
-    message("Vous avez lancé le grappin sur un: " .. entity_type, "info")
+    chatmsg("Vous avez lancé le grappin sur un: " .. entity_type, "info")
 end
 
 function pullPlayerToGrapplingHook(coords)
@@ -50,43 +50,19 @@ function grapplinghookStart()
     -- Vérifier si le joueur a déjà un crochet et/ou une corde attaché
     if next(items) ~= nil then
         RopeHandlerStop()
-        message("Vous rangez votre grappin", "info")
+        chatmsg("Vous rangez votre grappin", "info")
         logger("Items removed", "debug")
     else
         loadItems(playerPed, playerPos, Config.GrapplingHook.items, Config.GrapplingHook.orders) -- Charger les objets
         loadRopes(playerPed, playerPos, Config.GrapplingHook.ropes)  -- Charger les cordes
         PlayAnimation(playerPed, Config.GrapplingHook.animations.unthrow, 1000)
-        message("Vous sortez votre grappin", "info")
+        chatmsg("Vous sortez votre grappin", "info")
         logger("Items loaded", "debug")
     end
 
     logger("Player ped unfreezed: " .. playerPed, "debug")
     FreezeEntityPosition(playerPed, false)  -- Débloquer la position du joueur
 end
-
-
-function AttachPlayerToMovingCar(ped, vehicle)
-    -- Vérifiez que le véhicule et le péd existent et que le véhicule a un conducteur
-    if DoesEntityExist(ped) and DoesEntityExist(vehicle) and IsPedInVehicle(ped, vehicle, false) == false then
-        -- Récupérer les coordonnées du véhicule
-        local vehicleCoords = GetEntityCoords(vehicle)
-        local x, y, z = vehicleCoords.x, vehicleCoords.y, vehicleCoords.z + 1.0  -- Position de départ au-dessus du véhicule
-
-        -- Créer la corde entre le véhicule et le péd, avec longueur fixe et sans étirement
-        local rope = AddRope(x, y, z, 0.0, 10.0, 10.0, 10.0, 2, 0.0, 0.0, 0.0, true)
-
-        -- Attacher le péd à la corde
-        -- Le péd sera attaché à une position relative derrière le véhicule, ajustez les valeurs comme souhaité
-        AttachEntitiesToRope(ped, rope, 0.0, 1.5, 0.5, 0.0, 0.0, 0.0, 10.0)
-
-        -- Optionnel : Appliquer une force sur le véhicule pour s'assurer qu'il reste en mouvement
-        -- ApplyForceToEntity(vehicle, 1, 10.0, 0.0, 0.0, 0.0, 0.0, 0.0, true, true, true, true, true)
-
-        -- Empêcher la corde de s'étirer : gardez la corde tendue en contrôlant sa longueur
-        RopeForceLength(rope, 10.0)
-    end
-end
-
 
 function grapplinghookThread()
     DisableControlAction(0, 24, true) -- 24 est l'ID pour l'attaque avec clic gauche
@@ -102,7 +78,7 @@ function grapplinghookThread()
             DrawLineToTarget(coords)  -- Dessiner la ligne vers la cible
 
             if IsDisabledControlJustPressed(0, 24) then
-                message("Vous lancez le grappin", "info")
+                chatmsg("Vous lancez le grappin", "info")
                 PlayAnimation(PlayerPedId(), Config.GrapplingHook.animations.throw, 1000)
                 Wait(Config.GrapplingHook.animations.throw.wait)
                 grapplinghookThrow(coords, entity)
@@ -113,19 +89,19 @@ function grapplinghookThread()
     elseif is_rope_throwed then
         if IsDisabledControlJustPressed(0, 24) then
             PlayAnimation(PlayerPedId(), Config.GrapplingHook.animations.unthrow, 1000)
-            message("Vous récupérez le grappin", "info")
+            chatmsg("Vous récupérez le grappin", "info")
             RopeHandlerRestart()
         elseif entity_type == "vehicle" then
             logger("Attach player to moving car", "debug")
         elseif IsDisabledControlJustPressed(0, 96) then
-            message("Vous rapprochez le grappin", "info")
+            chatmsg("Vous rapprochez le grappin", "info")
             if entity_type == "ped" then
                 pullRope(entity_attached, PlayerPedId(), 10.0, is_rope_throwed)
             else
                 pullRope(PlayerPedId(), is_rope_throwed_item, 10.0, is_rope_throwed)
             end
         elseif IsDisabledControlJustPressed(0, 97) then
-            message("Vous éloignez le grappin", "info")
+            chatmsg("Vous éloignez le grappin", "info")
             if entity_type == "ped" then
                 pushRope(entity_attached, PlayerPedId(), 10.0, is_rope_throwed)
             else

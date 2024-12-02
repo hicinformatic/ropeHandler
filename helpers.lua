@@ -14,7 +14,7 @@ function logger(message, level)
 end
 
 -- Fun to log messages in chat
-function message(message, level)
+function chatmsg(message, level)
     -- Check if the log level is "debug" and if the debug mode is enabled
     if level == "debug" and not Config.Debug then return end
     -- Set the log level to "info" if it is not specified
@@ -24,6 +24,11 @@ function message(message, level)
         multiline = true,
         args = {Config.PrefixMsg, message}
     })
+end
+
+function logmsg(message, level)
+    chatmsg(message, level)
+    logger(message, level)
 end
 
 -- Func to load the language file
@@ -54,11 +59,11 @@ end
 -- Func to get the index of a bone by name
 function GetBoneIndexByName(boneName)
     logger("GetBoneIndexByName: " .. boneName, "debug")
-    return Config.Bones[boneName]
+    return Config.PedBones[boneName]
 end
 
 -- Func to get the entity type in string or number format
-function getentity_type(entity, format)
+function GetEntityType(entity, format)
     format = format or "string"
     if IsEntityAPed(entity) then
         return format == "string" and "ped" or 1
@@ -69,14 +74,21 @@ function getentity_type(entity, format)
     elseif IsEntityAMissionEntity(entity) then
         return format == "string" and "mission" or 4
     end
-    return format == "string" and "unknown" or 0
+    return format == "string" and "coords" or 0
+end
+
+function DisableControls(controls)
+    for _, control in ipairs(controls) do
+        DisableControlAction(0, control, true)
+    end
 end
 
 function isEntityInTypes(entity, types)
     for _, t in ipairs(types) do
-        if getentity_type(entity) == t then
+        if GetEntityType(entity) == t then
             return true
         end
     end
     return false
 end
+
