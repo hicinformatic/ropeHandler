@@ -1,4 +1,6 @@
 i18nload = nil
+peds_used = {}
+vehicles_used = {}
 
 -- Func to log messages in console
 function logger(message, level)
@@ -93,20 +95,35 @@ function isEntityInTypes(entity, types)
     return false
 end
 
-function getCfg(config, key, default)
-    if config and config[key] then
-        return config[key]
+function getCfg(cfg, key, default)
+    if cfg and cfg[key] then
+        return cfg[key]
     end
     return default or nil
 end
 
-function getCoordsEntity(entity, config)
-    if config and config.bonePed then
-        local boneIndex = GetPedBoneIndex(entity, getBoneIndexByName(config.bonePed))
+function getCoordsEntity(entity, cfg)
+    if cfg and cfg.bonePed then
+        local boneIndex = GetPedBoneIndex(entity, getBoneIndexByName(cfg.bonePed))
         return GetWorldPositionOfEntityBone(entity, boneIndex)
-    elseif config and config.boneVehicle then
-        local boneIndex = GetEntityBoneIndexByName(entity, config.boneVehicle)
+    elseif cfg and cfg.boneVehicle then
+        local boneIndex = GetEntityBoneIndexByName(entity, cfg.boneVehicle)
         return GetWorldPositionOfEntityBone(entity, boneIndex)
     end
     return GetEntityCoords(entity)
+end
+
+function setRopablePed(ped)
+    SetEntityInvincible(ped, true) -- Assurez-vous qu'il n'est pas invincible
+    table.insert(peds_used, ped)
+end
+
+function unsetRopablePed(ped)
+    SetEntityInvincible(ped, false) -- Désactiver l'invincibilité
+end
+
+function unsetRopablePeds()
+    for _, ped in ipairs(peds_used) do
+        unsetRopablePed(ped)
+    end
 end

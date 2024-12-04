@@ -55,7 +55,7 @@ function attachItemToPlayer(playerPed, playerPos, prop)
     return entity
 end
 
-function SpawnItemAtVehicle(vehicle, item, config)
+function SpawnItemAtVehicle(vehicle, item, cfg)
     local model = item.model
     local modelhash = GetHashKey(model)
 
@@ -66,8 +66,8 @@ function SpawnItemAtVehicle(vehicle, item, config)
 
     local entity = CreateObject(modelhash, 0.0, 0.0, 0.0, true, true, false)
     AttachEntityToEntity(entity, vehicle, GetEntityBoneIndexByName(vehicle, "chassis"),
-        (config and config.offset) or vector3(0.0, 0.0, 0.0),
-        (config and config.rotation) or vector3(0.0, 0.0, 0.0),
+        (cfg and cfg.offset) or vector3(0.0, 0.0, 0.0),
+        (cfg and cfg.rotation) or vector3(0.0, 0.0, 0.0),
         true, true, false, true, 1, true
     )
 
@@ -77,7 +77,7 @@ function SpawnItemAtVehicle(vehicle, item, config)
     return entity
 end
 
-function SpawnItemAtBone(ped, bone, item, config)
+function SpawnItemAtBone(ped, bone, item, cfg)
     local model = item.model
     local modelhash = GetHashKey(model)
 
@@ -90,8 +90,8 @@ function SpawnItemAtBone(ped, bone, item, config)
     local entity = CreateObject(modelhash, 0.0, 0.0, 0.0, true, true, false)
     local entityIndex = GetPedBoneIndex(ped, bone)
     AttachEntityToEntity(entity, ped, entityIndex,
-        (config and config.offset) or vector3(0.0, 0.0, 0.0),
-        (config and config.rotation) or vector3(0.0, 0.0, 0.0),
+        (cfg and cfg.offset) or vector3(0.0, 0.0, 0.0),
+        (cfg and cfg.rotation) or vector3(0.0, 0.0, 0.0),
         true, true, false, true, 1, true
     )
 
@@ -101,7 +101,7 @@ function SpawnItemAtBone(ped, bone, item, config)
     return entity
 end
 
-function SpawnItemAtCoords(coords, item, config)
+function SpawnItemAtCoords(coords, item, cfg)
     local model = item.model
     local modelhash = GetHashKey(model)
 
@@ -112,8 +112,8 @@ function SpawnItemAtCoords(coords, item, config)
 
     local entity = CreateObject(modelhash, coords, true, true, false)
     SetEntityCollision(entity,
-        (config and config.visible) or false,
-        (config and config.collision) or false
+        (cfg and cfg.visible) or false,
+        (cfg and cfg.collision) or false
     )
 
     SetModelAsNoLongerNeeded(modelhash)

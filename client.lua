@@ -4,7 +4,6 @@ current_usage = {
 }
 last_mode = nil
 
-
 local function help()
     chatmsg(i18n("Usage: /ropehook [ropetype]"), "info")
     chatmsg(i18n("Available ropetypes:"), "info")
@@ -59,6 +58,7 @@ end
 function RopeHandlerStop()
     removeItems(items_loaded)
     removeRopes(ropes_loaded)
+    unsetRopablePeds(peds_used)
     items_loaded = {}
     items_named = {}
     ropes_loaded = {}

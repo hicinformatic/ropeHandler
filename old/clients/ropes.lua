@@ -63,32 +63,32 @@ function attachRopeBetweenProps(playerPed, playerPos, rope)
     return ropeHandle
 end
 
-function SpawnRopeFromTo(from, to, config)
+function SpawnRopeFromTo(from, to, cfg)
     local fromPos = GetEntityCoords(from)
     local toPos = GetEntityCoords(to)
-    local ropeLength = (config and config.ropelength) or GetDistanceBetweenCoords(fromPos, toPos, true)
+    local ropeLength = (cfg and cfg.ropelength) or GetDistanceBetweenCoords(fromPos, toPos, true)
     logger("Rope length: " .. ropeLength, "debug")
 
     local maxRopeLength
-    if config and config.maxRopeLength then
+    if cfg and cfg.maxRopeLength then
         maxRopeLength = ropeLength
     else
-        maxRopeLength = (config and config.max) or 2.0
+        maxRopeLength = (cfg and cfg.max) or 2.0
     end
 
     ropeHandle = AddRope(
         fromPos, -- Position initiale
         vector3(0.0, 0.0, 0.0), -- Offset
         maxRopeLength, -- Longueur maximale
-        (config and config.type) or 3, -- Type de corde (4 = souple)
+        (cfg and cfg.type) or 3, -- Type de corde (4 = souple)
         ropeLength, -- initLength : Longueur initiale de la corde
-        (config and config.min) or 0.01, -- minLength : Longueur minimale que la corde peut atteindre
-        (config and config.rate) or 1.0, -- lengthChangeRate : Vitesse d'enroulement/déroulement
+        (cfg and cfg.min) or 0.01, -- minLength : Longueur minimale que la corde peut atteindre
+        (cfg and cfg.rate) or 1.0, -- lengthChangeRate : Vitesse d'enroulement/déroulement
         false, -- onlyPPU : Inconnu, mettre false par défaut
-        (config and config.collision) or false, -- collisionOn : Activer les collisions de la corde
-        (config and config.lock) or false, -- lockFromFront : Si true, la corde devient rigide si maxLength est 0
-        (config and config.multiplier) or 1.0, -- timeMultiplier : Multiplicateur de physique
-        (config and config.breakable) or false, -- breakable : Permet de casser la corde par des tirs
+        (cfg and cfg.collision) or false, -- collisionOn : Activer les collisions de la corde
+        (cfg and cfg.lock) or false, -- lockFromFront : Si true, la corde devient rigide si maxLength est 0
+        (cfg and cfg.multiplier) or 1.0, -- timeMultiplier : Multiplicateur de physique
+        (cfg and cfg.breakable) or false, -- breakable : Permet de casser la corde par des tirs
         0 -- unkPtr : Inconnu, toujours 0
     )
 
@@ -97,19 +97,19 @@ function SpawnRopeFromTo(from, to, config)
         return
     end
 
-    if config and config.fromOffset then
+    if cfg and cfg.fromOffset then
         fromPos = vector3(
-            fromPos.x + config.fromOffset.x,
-            fromPos.y + config.fromOffset.y,
-            fromPos.z + config.fromOffset.z
+            fromPos.x + cfg.fromOffset.x,
+            fromPos.y + cfg.fromOffset.y,
+            fromPos.z + cfg.fromOffset.z
         )
     end
 
-    if config and config.toOffset then
+    if cfg and cfg.toOffset then
         toPos = vector3(
-            toPos.x + config.toOffset.x,
-            toPos.y + config.toOffset.y,
-            toPos.z + config.toOffset.z
+            toPos.x + cfg.toOffset.x,
+            toPos.y + cfg.toOffset.y,
+            toPos.z + cfg.toOffset.z
         )
     end
 

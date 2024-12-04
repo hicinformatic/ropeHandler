@@ -1,57 +1,37 @@
 ropes_loaded = {}
 ropes_named = {}
 
-
-function GetCoordsFromTo(from, to, config)
-    local fromBone, toBone
-
-    if config and config.fromBonePed then
-        fromBone = GetPedBoneIndex(from, getBoneIndexByName(config.fromBonePed))
-        logger(i18n("From bone index: %s", fromBone), "info")
-    end
-
-    if config and config.toBonePed then
-        toBone = GetPedBoneIndex(to, getBoneIndexByName(config.toBonePed))
-        logger(i18n("To bone index: %s", toBone), "info")
-    end
-
-    -- Obtenir les positions globales des entités
-    local fromPos = fromBone and GetWorldPositionOfEntityBone(from, fromBonePed) or GetEntityCoords(from)
-    local toPos = toBone and GetWorldPositionOfEntityBone(to, toBonePed) or GetEntityCoords(to)
-    return fromPos, toPos
-end
-
 function StartRope(rope)
     StartRopeUnwindingFront(rope) -- Permet de dérouler la corde
     ActivatePhysics(rope) -- Activer la physique sur la corde
     RopeLoadTextures() -- Charger les textures de la corde
 end
 
-function SpawnRope(from, to, config)
-    fromPos = getCoordsEntity(from, {bonePed = config.fromBonePed, boneVehicle = config.fromBoneVehicle})
-    toPos = getCoordsEntity(to, {bonePed = config.toBonePed, boneVehicle = config.toBoneVehicle})
+function SpawnRope(from, to, cfg)
+    fromPos = getCoordsEntity(from, {bonePed = cfg.fromBonePed, boneVehicle = cfg.fromBoneVehicle})
+    toPos = getCoordsEntity(to, {bonePed = cfg.toBonePed, boneVehicle = cfg.toBoneVehicle})
 
     -- Calculer la distance entre les deux entités
     local distanceCalc = #(fromPos - toPos)
-    local distance = getCfg(config, "distance", distanceCalc)
-    local max_length = getCfg(config, "maxLength", distance)
-    local direction = getCfg(config, "direction", vector3(0.0, 0.0, 0.0))
+    local distance = getCfg(cfg, "distance", distanceCalc)
+    local max_length = getCfg(cfg, "maxLength", distance)
+    local direction = getCfg(cfg, "direction", vector3(0.0, 0.0, 0.0))
 
     -- Créer la corde
     local rope = AddRope(
         fromPos.x, fromPos.y, fromPos.z, -- Position initiale
         direction.x, direction.y, direction.z, -- Direction
-        max_length, -- Longueur maximale
-        getCfg(config, "ropeType", 4), -- Type de corde
-        getCfg(config, "initLength", distance), -- Longueur initiale
-        getCfg(config, "minLength", 0.0), -- Longueur minimale
-        getCfg(config, "lengthChangeRate", 1.0), -- Taux d'enroulement
-        getCfg(config, "onlyPPU", false), -- Inconnu
-        getCfg(config, "collisionOn", false), -- Collision activée ?
-        getCfg(config, "lockFromFront", (max_length == 0)), -- Rigide ?
-        getCfg(config, "timeMultiplier", 1.0), -- Multiplieur de physique
-        getCfg(config, "breakable", false), -- Corde cassable ?
-        getCfg(config, "unkPtr", 0) -- Inconnu
+        max_length, -- Longueur maximale (! RopeForceLength isn't working)
+        getCfg(cfg, "ropeType", 4), -- Type de corde
+        getCfg(cfg, "initLength", distance), -- Longueur initiale
+        getCfg(cfg, "minLength", 0.0), -- Longueur minimale
+        getCfg(cfg, "lengthChangeRate", 1.0), -- Taux d'enroulement
+        getCfg(cfg, "onlyPPU", false), -- Inconnu
+        getCfg(cfg, "collisionOn", false), -- Collision activée ?
+        getCfg(cfg, "lockFromFront", (max_length == 0)), -- Rigide ?
+        getCfg(cfg, "timeMultiplier", 1.0), -- Multiplieur de physique
+        getCfg(cfg, "breakable", false), -- Corde cassable ?
+        getCfg(cfg, "unkPtr", 0) -- Inconnu
     )
 
     if rope == nil then
@@ -59,27 +39,27 @@ function SpawnRope(from, to, config)
         return
     end
 
-    local ropename = getCfg(config, "ropename")
+    local ropename = getCfg(cfg, "ropename")
     if ropename then ropes_named[ropename] = rope end
 
     table.insert(ropes_loaded, rope)
     return rope, max_length, distance
 end
 
-function AttachRope(rope, from, to, config)
-    local fromPos = getCfg(config, "fromPos", vector3(0.0, 0.0, 0.0))
-    local toPos = getCfg(config, "toPos", vector3(0.0, 0.0, 0.0))
-    local fromOffset = getCfg(config, "fromOffset")
-    local toOffset = getCfg(config, "toOffset")
+function AttachRope(rope, from, to, cfg)
+    local fromPos = getCfg(cfg, "fromPos", vector3(0.0, 0.0, 0.0))
+    local toPos = getCfg(cfg, "toPos", vector3(0.0, 0.0, 0.0))
+    local fromOffset = getCfg(cfg, "fromOffset")
+    local toOffset = getCfg(cfg, "toOffset")
 
     if not isEntityInTypes(from, {"ped", "vehicle"}) then
-        fromPos = getCoordsEntity(from, {bonePed = config.fromBonePed, boneVehicle = config.fromBoneVehicle})
+        fromPos = getCoordsEntity(from, {bonePed = cfg.fromBonePed, boneVehicle = cfg.fromBoneVehicle})
     end
     if not isEntityInTypes(to, {"ped", "vehicle"}) then
-        toPos = getCoordsEntity(to, {bonePed = config.toBonePed, boneVehicle = config.toBoneVehicle})
+        toPos = getCoordsEntity(to, {bonePed = cfg.toBonePed, boneVehicle = cfg.toBoneVehicle})
     end
 
-    local ropeLength = getCfg(config, "ropeLength", GetDistanceBetweenCoords(fromPos, toPos, true))
+    local ropeLength = getCfg(cfg, "ropeLength", GetDistanceBetweenCoords(fromPos, toPos, true))
     logger(i18n("Rope length: %s", ropeLength), "debug")
 
     if fromOffset then fromPos = fromPos + fromOffset end
@@ -92,20 +72,28 @@ function AttachRope(rope, from, to, config)
         fromPos.x, fromPos.y, fromPos.z, -- Point d'attachement 1
         toPos.x, toPos.y, toPos.z, -- Point d'attachement 2 ajusté pour la main gauche
         10.0,
-        getCfg(config, "physic", false), -- Physique activée
-        getCfg(config, "collision", false), -- Collision activée
-        getCfg(config, "fromBonePed", nil), -- Os de la première entité
-        getCfg(config, "toBonePed", nil) -- Os de la seconde entité
+        getCfg(cfg, "physic", false), -- Physique activée
+        getCfg(cfg, "collision", false), -- Collision activée
+        getCfg(cfg, "fromBonePed", nil), -- Os de la première entité
+        getCfg(cfg, "toBonePed", nil) -- Os de la seconde entité
     )
 end
 
-function SpawnRopeAndAttach(from, to, config)
-    config = config or {}
-    local rope, maxLength, distance = SpawnRope(from, to, config)
-    config.ropeLength = distance
-    AttachRope(rope, from, to, config)
+function SpawnRopeAndAttach(from, to, cfg)
+    cfg = cfg or {}
+    local rope, maxLength, distance = SpawnRope(from, to, cfg)
+    cfg.ropeLength = distance
+    AttachRope(rope, from, to, cfg)
     StartRope(rope)
     return rope
+end
+
+function SetRopeLength(rope, from, to, cfg)
+    logger("SetRopeLength: " .. rope, "debug")
+    local fromPos = getCoordsEntity(from, cfg)
+    local toPos = getCoordsEntity(from, cfg)
+    local distance = GetDistanceBetweenCoords(fromPos, toPos, true)
+    RopeForceLength(rope, 0.1)
 end
 
 function removeRopes(ropes)

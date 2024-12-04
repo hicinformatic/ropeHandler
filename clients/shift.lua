@@ -1,61 +1,75 @@
--- Fonction pour tirer le personnage vers le grappin
-function pullEntity(from, to, config)
+function moveEntity(mode, from, to, cfg)
     local fromPos = GetEntityCoords(from)
     local toPos = GetEntityCoords(to)
     local distance = #(fromPos - toPos)
-    if distance < 1.0 then return end
-    if config.secure then
-        local secureDistance = config.secure*config.step
-        if distance < secureDistance then
-            return
-        end
+    local force = getCfg(cfg, "step", 0.1)
+    local stopDistance = getCfg(cfg, "stopDistance")
+    local secureDistance = getCfg(cfg, "secureDistance")
+    local direction
+
+    if stopDistance and distance < stopDistance then
+        logger(i18n("Stop distance reached"), "info")
+        return
     end
-    -- Calculer la direction et la force de traction
-    local direction = (toPos - fromPos) / distance
-    local force = config.step or 0.1 -- Ajustez la force selon vos besoins
-    -- Appliquer la force au personnage
+
+    if secureDistance and distance < secureDistance then
+        logger(i18n("Secure distance reached"), "info")
+        force = 0.01
+    end
+
+    if mode == "pull" then
+        direction = (toPos - fromPos) / distance
+    else
+        direction = (fromPos - toPos) / distance
+    end
     ApplyForceToEntity(from, 1, direction.x * force, direction.y * force, direction.z * force, 0, 0, 0, 0, false, true, true, false, true)
-    if config.rope then
-        -- Mettre à jour la longueur de la corde
-        SetRopeLength(config.rope, distance)
-    end
 end
 
--- Fonction pour pousser le personnage loin du grappin
-function pushEntity(from, to, config)
+function moveEntityDynToEntityDyn(mode, from, to, cfg)
     local fromPos = GetEntityCoords(from)
     local toPos = GetEntityCoords(to)
     local distance = #(fromPos - toPos)
-    -- Calculer la direction et la force de traction
-    if distance < 1.0 then return end
-    if config.secure then
-        local secureDistance = config.secure*config.step
-        if distance < secureDistance then
-            return
-        end
+    local force = getCfg(cfg, "step", 0.1)
+    local stopDistance = getCfg(cfg, "stopDistance")
+    local secureDistance = getCfg(cfg, "secureDistance")
+    local directionFrom, directionTo
+
+    if stopDistance and distance < stopDistance then
+        logger(i18n("Stop distance reached"), "info")
+        return
     end
-    local direction = (fromPos - toPos) / distance
-    local force = config.step or 0.1 -- Ajustez la force selon vos besoins
-    -- Appliquer la force au personnage
-    ApplyForceToEntity(from, 1, direction.x * force, direction.y * force, direction.z * force, 0, 0, 0, 0, false, true, true, false, true)
-    if config.rope then
-        -- Mettre à jour la longueur de la corde
-        SetRopeLength(config.rope, distance)
+
+    if secureDistance and distance < secureDistance then
+        logger(i18n("Secure distance reached"), "info")
+        force = 0.01
     end
+
+    if mode == "pull" then
+        directionFrom = (toPos - fromPos) / distance
+        directionTo = (fromPos - toPos) / distance
+    else
+        directionFrom = (fromPos - toPos) / distance
+        directionTo = (toPos - fromPos) / distance
+    end
+
+    ApplyForceToEntity(from, 1, directionFrom.x * force, directionFrom.y * force, directionFrom.z * force, 0, 0, 0, 0, false, true, true, false, true)
+    ApplyForceToEntity(to, 1, directionTo.x * force, directionTo.y * force, directionTo.z * force, 0, 0, 0, 0, false, true, true, false, true)
 end
 
-function pullEntityWithCoords(from, to, config)
+
+
+function pullEntityWithCoords(from, to, cfg)
     local fromPos = GetEntityCoords(from)
     local toPos = GetEntityCoords(to)
     local distance = #(fromPos - toPos)
     if distance < 1.0 then return end
     -- Calculer la direction et la force de traction
     local direction = (toPos - fromPos) / distance
-    local force = config.step or 0.1 -- Ajustez la force selon vos besoins
+    local force = cfg.step or 0.1 -- Ajustez la force selon vos besoins
     -- Appliquer la force au personnage
     ApplyForceToEntity(from, 1, direction.x * force, direction.y * force, direction.z * force, 0, 0, 0, 0, false, true, true, false, true)
-    --if config.rope then
+    --if cfg.rope then
     --    -- Mettre à jour la longueur de la corde
-    --    SetRopeLength(config.rope, distance)
+    --    SetRopeLength(cfg.rope, distance)
     --end
 end

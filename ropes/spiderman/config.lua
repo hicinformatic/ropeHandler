@@ -12,10 +12,17 @@ spidermanConfig = {
     }
 }
 
+spidermanConfig.steps = {
+    object = {step = 10.0, secure = 2.0},
+    ped = {step = 10.0, secure = 2.0},
+    vehicle = {step = 10.0, secure = 2.0},
+    coords = {step = 10.0, secure = 2.0},
+}
+
 spidermanConfig.items = {
     raygun1 = {
         model = "m23_1_prop_m31_pi_raygun",
-        bone = "SKEL_L_Hand",
+        bonePed = "SKEL_L_Hand",
         offset = vector3(0.17, 0.05, -0.01),
         rotation = vector3(-120.0, 0.0, 0.0),
         noCollision = true,
@@ -24,7 +31,7 @@ spidermanConfig.items = {
     },
     raygun2 = {
         model = "m23_1_prop_m31_pi_raygun",
-        bone = "SKEL_R_Hand",
+        bonePed = "SKEL_R_Hand",
         offset = vector3(0.19, 0.05, 0.01),
         rotation = vector3(-60.0, 0.0, 0.0),
         noCollision = true,
@@ -33,21 +40,21 @@ spidermanConfig.items = {
     },
     righthand = {
         model = "prop_golf_ball",
-        bone = "SKEL_R_Hand",
+        bonePed = "SKEL_R_Hand",
         offset = vector3(0.1, 0.01, 0.0),
         --invisible = true,
         itemname = "ghrighthand",
     },
     lefthand = {
         model = "prop_golf_ball",
-        bone = "SKEL_L_Hand",
+        bonePed = "SKEL_L_Hand",
         offset = vector3(0.1, -0.01, 0.0),
         --invisible = true,
         itemname = "ghlefthand",
     },
     pelvis = {
         model = "prop_golf_ball",
-        bone = "SKEL_Pelvis",
+        bonePed = "SKEL_Pelvis",
         itemname = "ghpelvis",
     },
 }

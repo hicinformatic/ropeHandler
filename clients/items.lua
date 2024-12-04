@@ -9,66 +9,69 @@ function getModel(model)
     return GetHashKey(model)
 end
 
-function SpawnItem(item, config)
-    local entityToPos = (config and config.entityToPos) or PlayerPedId()
-    local initPos
+function SpawnItem(model, target, cfg)
+    local entityToPos = target
+    local initPos = getCfg(cfg, "coords", vector3(0.0, 0.0, 0.0))
+    local bonePos = getCfg(cfg, "bonePos")
+    local calcPos = getCfg(cfg, "calcPos")
 
-    if config and config.coords then
-        initPos = config.coords
-    elseif config and config.bonePos then
-        local boneIndex = GetPedBoneIndex(entityToPos, getBoneIndexByName(config.bonePos))
+    if bonePos then
+        local boneIndex = GetPedBoneIndex(entityToPos, getBoneIndexByName(cfg.bonePos))
         initPos = GetWorldPositionOfEntityBone(entityToPos, boneIndex)
-    else
+    elseif calcPos then
         initPos = GetEntityCoords(entityToPos)
     end
 
-    if config and config.entityOffset then initPos = initPos + config.entityOffset end
+    if cfg and cfg.itemOffset then initPos = initPos + cfg.itemOffset end
 
-    local modelhash = getModel(item)
+    local modelhash = getModel(model)
     local entity = CreateObject(
         modelhash,
-        (config and config.axis) or initPos,
-        (config and config.isNetwork) or true,
-        (config and config.isPhysical) or true,
-        (config and config.doorFlag) or false
+        initPos,
+        (cfg and cfg.isNetwork) or true,
+        (cfg and cfg.isPhysical) or true,
+        (cfg and cfg.doorFlag) or false
     )
 
-    if config and config.entityFixed then SetEntityCollision(entity, false, false) end
-    if config and config.entityRotation then SetEntityRotation(entity, config.entityRotation, 2, true) end
-    if config and config.noCollision then SetEntityCompletelyDisableCollision(entity, false, true) end
-    if config and config.invisible then SetEntityVisible(entity, false, false) end
-    if config and config.itemname then items_named[config.itemname] = entity end
+    if cfg and cfg.itemFixed then SetEntityCollision(entity, false, false) end
+    if cfg and cfg.itemRotation then SetEntityRotation(entity, cfg.itemRotation, 2, true) end
+    if cfg and cfg.noCollision then SetEntityCompletelyDisableCollision(entity, false, true) end
+    if cfg and cfg.invisible then SetEntityVisible(entity, false, false) end
+    if cfg and cfg.itemname then items_named[cfg.itemname] = entity end
 
     SetModelAsNoLongerNeeded(modelhash)
     table.insert(items_loaded, entity)
     return entity
 end
 
-function AttachItem(entity, to, config)
+function AttachItem(item, to, cfg)
     local boneIndex
-    if config and config.bone then
-        boneIndex = GetPedBoneIndex(to, getBoneIndexByName(config.bone))
+
+    if cfg and cfg.bonePed then
+        boneIndex = GetPedBoneIndex(to, getBoneIndexByName(cfg.bonePed))
+    elseif cfg and cfg.boneVehicle then
+        boneIndex = GetEntityBoneIndexByName(to, cfg.boneVehicle)
     end
 
     AttachEntityToEntity(
-        entity,
+        item,
         to,
         boneIndex,
-        (config and config.offset) or vector3(0.0, 0.0, 0.0),
-        (config and config.rotation) or vector3(0.0, 0.0, 0.0),
-        (config and config.p9) or true,
-        (config and config.useSoftPinning) or true,
+        (cfg and cfg.offset) or vector3(0.0, 0.0, 0.0),
+        (cfg and cfg.rotation) or vector3(0.0, 0.0, 0.0),
+        (cfg and cfg.p9) or true,
+        (cfg and cfg.useSoftPinning) or true,
         false,
-        IsEntityAPed(to) or (config and config.isPed) or true,
-        (config and config.rotationOrder) or 1,
-        (config and config.syncRot) or true
+        IsEntityAPed(to) or (cfg and cfg.isPed) or true,
+        (cfg and cfg.rotationOrder) or 1,
+        (cfg and cfg.syncRot) or true
     )
-    return entity
+    return item
 end
 
-function SpawnItemAndAttach(item, to, config)
-    local entity = SpawnItem(item, config)
-    AttachItem(entity, to, config)
+function SpawnItemAndAttach(item, to, cfg)
+    local entity = SpawnItem(item, to, cfg)
+    AttachItem(entity, to, cfg)
     return entity
 end
 

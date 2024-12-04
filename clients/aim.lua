@@ -1,7 +1,7 @@
-function ShowCrosshair(config, accessible)
-    -- Default configuration
-    if not config then
-        config = {
+function ShowCrosshair(cfg, accessible)
+    -- Default cfguration
+    if not cfg then
+        cfg = {
             crosshairDict = "helicopterhud",
             crosshaireName = "hud_dest",
             crosshairColorOff = {128, 128, 128, 125},
@@ -9,8 +9,8 @@ function ShowCrosshair(config, accessible)
         }
     end
     -- Get the texture dictionary and texture name
-    local textureDict = config.crosshairDict -- Exemple de dictionnaire d'icônes
-    local textureName = config.crosshaireName -- Exemple d'icône à afficher
+    local textureDict = cfg.crosshairDict -- Exemple de dictionnaire d'icônes
+    local textureName = cfg.crosshaireName -- Exemple d'icône à afficher
     -- Load the texture if necessary
     if not HasStreamedTextureDictLoaded(textureDict) then
         RequestStreamedTextureDict(textureDict, true)
@@ -19,11 +19,11 @@ function ShowCrosshair(config, accessible)
         end
     end
     -- Coordinates and size of the icon
-    local x = (config and config.x) or 0.5  -- Center horizontal (50% of the screen width)
-    local y = (config and config.y) or 0.5  -- Center vertical (50% of the screen height)
-    local width = (config and config.width) or 0.008  -- Width of the icon (3% of the screen width)
-    local height = (config and config.height) or 0.014  -- Height of the icon (5% of the screen height)
-    local rotation = (config and config.rotation) or 0.0  -- Rotation of the icon (0 degrees)
+    local x = (cfg and cfg.x) or 0.5  -- Center horizontal (50% of the screen width)
+    local y = (cfg and cfg.y) or 0.5  -- Center vertical (50% of the screen height)
+    local width = (cfg and cfg.width) or 0.008  -- Width of the icon (3% of the screen width)
+    local height = (cfg and cfg.height) or 0.014  -- Height of the icon (5% of the screen height)
+    local rotation = (cfg and cfg.rotation) or 0.0  -- Rotation of the icon (0 degrees)
 
     -- Dessiner l'icône au centre de l'écran
     if accessible then
@@ -36,10 +36,10 @@ function ShowCrosshair(config, accessible)
             width,
             height,
             rotation,
-            config.colorOn[1],
-            config.colorOn[2],
-            config.colorOn[3],
-            config.colorOn[4]
+            cfg.colorOn[1],
+            cfg.colorOn[2],
+            cfg.colorOn[3],
+            cfg.colorOn[4]
         )
     else
         -- L'objet n'est pas accessible, afficher l'icône rouge
@@ -51,10 +51,10 @@ function ShowCrosshair(config, accessible)
             width,
             height,
             rotation,
-            config.colorOff[1],
-            config.colorOff[2],
-            config.colorOff[3],
-            config.colorOff[4]
+            cfg.colorOff[1],
+            cfg.colorOff[2],
+            cfg.colorOff[3],
+            cfg.colorOff[4]
         )  -- Couleur rouge (255,0,0)
     end
 end
@@ -92,7 +92,7 @@ function RayCastGamePlayCamera(distance)
         y = cameraCoord.y + direction.y * distance,
         z = cameraCoord.z + direction.z * distance
     }
-    local retval, hit, coords, surface, entity, bone = GetShapeTestResult(
+    local retval, hit, coords, surface, entity = GetShapeTestResult(
         StartShapeTestRay(
             cameraCoord.x,
             cameraCoord.y,
@@ -105,7 +105,7 @@ function RayCastGamePlayCamera(distance)
             1
         )
     )
-    return hit, coords, entity, bone
+    return hit, coords, entity
 end
 
 function TurnPedToTarget(ped)
@@ -126,40 +126,40 @@ function getBoneEntity(coords, entity, boneIndex, step)
     return distance < step
 end
 
-function getPedBoneEntity(coords, entity, config)
-    if not config then
-        config = { step = 0.1, stop = 5 }
+function getPedBoneEntity(coords, entity, cfg)
+    if not cfg then
+        cfg = { step = 0.1, stop = 5 }
     end
     for k, v in pairs(Config.PedBones) do
         local boneIndex = GetPedBoneIndex(entity, v)-- Obtenir l'index du bone par son nom
-        if getBoneEntity(coords, entity, boneIndex, config.step) then
+        if getBoneEntity(coords, entity, boneIndex, cfg.step) then
             logmsg(i18n("Bone found: %s -> %s", v, k), "info")
             return boneIndex, k
         end
     end
-    if config.step > config.stop then
+    if cfg.step > cfg.stop then
         logmsg(i18n("Bone not found"), "info")
         return nil
     end
-    config.step = config.step + 0.1
-    return getPedBoneEntity(coords, entity, config)
+    cfg.step = cfg.step + 0.1
+    return getPedBoneEntity(coords, entity, cfg)
 end
 
-function getVehicleBoneEntity(coords, entity, config)
-    if not config then
-        config = { step = 0.1, stop = 5 }
+function getVehicleBoneEntity(coords, entity, cfg)
+    if not cfg then
+        cfg = { step = 0.1, stop = 5 }
     end
-    logmsg(i18n("getVehicleBoneEntity step: %s", config.step), "debug")
+    logmsg(i18n("getVehicleBoneEntity step: %s", cfg.step), "debug")
     for k, v in pairs(Config.VehicleBones) do
         local boneIndex = GetEntityBoneIndexByName(entity, v)-- Obtenir l'index du bone par son nom
-        if getBoneEntity(coords, entity, boneIndex, config.step) then
+        if getBoneEntity(coords, entity, boneIndex, cfg.step) then
             logmsg(i18n("Bone found: %s", v), "info")
             return boneIndex, v
         end
     end
-    if config.step > config.stop then
+    if cfg.step > cfg.stop then
         return nil
     end
-    config.step = config.step + 0.1
-    return getVehicleBoneEntity(coords, entity, config)
+    cfg.step = cfg.step + 0.1
+    return getVehicleBoneEntity(coords, entity, cfg)
 end
