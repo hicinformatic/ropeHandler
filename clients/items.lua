@@ -10,21 +10,19 @@ function getModel(model)
 end
 
 function SpawnItem(item, config)
-    local ped = PlayerPedId()
+    local entityToPos = (config and config.entityToPos) or PlayerPedId()
     local initPos
 
     if config and config.coords then
         initPos = config.coords
     elseif config and config.bonePos then
-        local boneIndex = GetPedBoneIndex(ped, GetBoneIndexByName(config.bonePos))
-        initPos = GetWorldPositionOfEntityBone(ped, boneIndex)
+        local boneIndex = GetPedBoneIndex(entityToPos, getBoneIndexByName(config.bonePos))
+        initPos = GetWorldPositionOfEntityBone(entityToPos, boneIndex)
     else
-        initPos = GetEntityCoords(ped)
+        initPos = GetEntityCoords(entityToPos)
     end
 
-    if config and config.entityOffset then
-        initPos = initPos + config.entityOffset
-    end
+    if config and config.entityOffset then initPos = initPos + config.entityOffset end
 
     local modelhash = getModel(item)
     local entity = CreateObject(
@@ -35,36 +33,21 @@ function SpawnItem(item, config)
         (config and config.doorFlag) or false
     )
 
-    if config and config.entityFixed then
-        SetEntityCollision(entity, false, false)
-    end
-
-    if config and config.entityRotation then
-         SetEntityRotation(entity, config.entityRotation, 2, true)
-    end
-
-    if config and config.noCollision then
-        SetEntityCompletelyDisableCollision(entity, false, true)
-    end
-
-    if config and config.invisible then
-        SetEntityVisible(entity, false, false)
-    end
-
-    table.insert(items_loaded, entity)
-
-    if config and config.itemname then
-        items_named[config.itemname] = entity
-    end
+    if config and config.entityFixed then SetEntityCollision(entity, false, false) end
+    if config and config.entityRotation then SetEntityRotation(entity, config.entityRotation, 2, true) end
+    if config and config.noCollision then SetEntityCompletelyDisableCollision(entity, false, true) end
+    if config and config.invisible then SetEntityVisible(entity, false, false) end
+    if config and config.itemname then items_named[config.itemname] = entity end
 
     SetModelAsNoLongerNeeded(modelhash)
+    table.insert(items_loaded, entity)
     return entity
 end
 
 function AttachItem(entity, to, config)
     local boneIndex
     if config and config.bone then
-        boneIndex = GetPedBoneIndex(to, GetBoneIndexByName(config.bone))
+        boneIndex = GetPedBoneIndex(to, getBoneIndexByName(config.bone))
     end
 
     AttachEntityToEntity(

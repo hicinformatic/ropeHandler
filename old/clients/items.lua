@@ -85,6 +85,7 @@ function SpawnItemAtBone(ped, bone, item, config)
     while not HasModelLoaded(modelhash) do
         Wait(500)  -- Attendre que le modèle soit chargé
     end
+    local initPos = GetEntityCoords(ped)
 
     local entity = CreateObject(modelhash, 0.0, 0.0, 0.0, true, true, false)
     local entityIndex = GetPedBoneIndex(ped, bone)

@@ -130,11 +130,10 @@ function getPedBoneEntity(coords, entity, config)
     if not config then
         config = { step = 0.1, stop = 5 }
     end
-    logmsg(i18n("getPedBoneEntity step: %s", config.step), "debug")
     for k, v in pairs(Config.PedBones) do
         local boneIndex = GetPedBoneIndex(entity, v)-- Obtenir l'index du bone par son nom
         if getBoneEntity(coords, entity, boneIndex, config.step) then
-            logmsg(i18n("Bone found: %s", v), "info")
+            logmsg(i18n("Bone found: %s -> %s", v, k), "info")
             return boneIndex, k
         end
     end

@@ -79,7 +79,14 @@ end, false)
 Citizen.CreateThread(function()
      while true do
         Citizen.Wait(0)
-        if current_usage.mode and isStringInArray(Config.Ropes, current_usage.mode) then
+        local isDead = IsEntityDead(PlayerPedId())
+        if isDead then
+            chatmsg(i18n("You are dead !"), "info")
+            RopeHandlerStop()
+            while IsEntityDead(playerPed) do
+                Citizen.Wait(1000)
+            end
+        elseif current_usage.mode and isStringInArray(Config.Ropes, current_usage.mode) then
             -- Enable the rope mode
             _G[current_usage.mode .. "Thread"]()
         end

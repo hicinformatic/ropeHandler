@@ -2,10 +2,11 @@ i18nload = nil
 
 -- Func to log messages in console
 function logger(message, level)
+    local color = Config.ColorsMsg.default[1]
     -- Check if the log level is "debug" and if the debug mode is enabled
     if level == "debug" and not Config.Debug then return end
-    -- Set the color of the message
-    local color = Config.ColorsMsg[level][1] or Config.ColorsMsg.default[1]
+    if level == nil then level = "info" end
+    if Config.ColorsMsg[level] then color = Config.ColorsMsg[level][1] or Config.ColorsMsg.default[1] end
     if level ~= nil then
         print(string.format("%s (%s): %s%s", Config.PrefixMsg, level:upper(), message, Config.ColorsMsg.default[1]))
     else
@@ -57,13 +58,13 @@ function isStringInArray(array, str)
 end
 
 -- Func to get the index of a bone by name
-function GetBoneIndexByName(boneName)
-    logger("GetBoneIndexByName: " .. boneName, "debug")
+function getBoneIndexByName(boneName)
+    logger("getBoneIndexByName: " .. boneName, "debug")
     return Config.PedBones[boneName]
 end
 
 -- Func to get the entity type in string or number format
-function GetEntityType(entity, format)
+function getEntityTypeFormat(entity, format)
     format = format or "string"
     if IsEntityAPed(entity) then
         return format == "string" and "ped" or 1
@@ -77,7 +78,7 @@ function GetEntityType(entity, format)
     return format == "string" and "coords" or 0
 end
 
-function DisableControls(controls)
+function disableControls(controls)
     for _, control in ipairs(controls) do
         DisableControlAction(0, control, true)
     end
@@ -85,10 +86,27 @@ end
 
 function isEntityInTypes(entity, types)
     for _, t in ipairs(types) do
-        if GetEntityType(entity) == t then
+        if getEntityTypeFormat(entity) == t then
             return true
         end
     end
     return false
 end
 
+function getCfg(config, key, default)
+    if config and config[key] then
+        return config[key]
+    end
+    return default or nil
+end
+
+function getCoordsEntity(entity, config)
+    if config and config.bonePed then
+        local boneIndex = GetPedBoneIndex(entity, getBoneIndexByName(config.bonePed))
+        return GetWorldPositionOfEntityBone(entity, boneIndex)
+    elseif config and config.boneVehicle then
+        local boneIndex = GetEntityBoneIndexByName(entity, config.boneVehicle)
+        return GetWorldPositionOfEntityBone(entity, boneIndex)
+    end
+    return GetEntityCoords(entity)
+end
