@@ -3,7 +3,7 @@ ropes_named = {}
 
 function StartRope(rope)
     StartRopeUnwindingFront(rope) -- Permet de dérouler la corde
-    ActivatePhysics(rope) -- Activer la physique sur la corde
+    -- ActivatePhysics(rope) -- Activer la physique sur la corde
     RopeLoadTextures() -- Charger les textures de la corde
 end
 
@@ -60,7 +60,6 @@ function AttachRope(rope, from, to, cfg)
     end
 
     local ropeLength = getCfg(cfg, "ropeLength", GetDistanceBetweenCoords(fromPos, toPos, true))
-    logger(i18n("Rope length: %s", ropeLength), "debug")
 
     if fromOffset then fromPos = fromPos + fromOffset end
     if toOffset then toPos = toPos + toOffset end
@@ -89,7 +88,6 @@ function SpawnRopeAndAttach(from, to, cfg)
 end
 
 function SetRopeLength(rope, from, to, cfg)
-    logger("SetRopeLength: " .. rope, "debug")
     local fromPos = getCoordsEntity(from, cfg)
     local toPos = getCoordsEntity(from, cfg)
     local distance = GetDistanceBetweenCoords(fromPos, toPos, true)

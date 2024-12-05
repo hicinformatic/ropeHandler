@@ -127,39 +127,27 @@ function getBoneEntity(coords, entity, boneIndex, step)
 end
 
 function getPedBoneEntity(coords, entity, cfg)
-    if not cfg then
-        cfg = { step = 0.1, stop = 5 }
-    end
+    if not cfg then cfg = { step = 0.1, stop = 5 } end
     for k, v in pairs(Config.PedBones) do
         local boneIndex = GetPedBoneIndex(entity, v)-- Obtenir l'index du bone par son nom
         if getBoneEntity(coords, entity, boneIndex, cfg.step) then
-            logmsg(i18n("Bone found: %s -> %s", v, k), "info")
             return boneIndex, k
         end
     end
-    if cfg.step > cfg.stop then
-        logmsg(i18n("Bone not found"), "info")
-        return nil
-    end
+    if cfg.step > cfg.stop then return nil end
     cfg.step = cfg.step + 0.1
     return getPedBoneEntity(coords, entity, cfg)
 end
 
 function getVehicleBoneEntity(coords, entity, cfg)
-    if not cfg then
-        cfg = { step = 0.1, stop = 5 }
-    end
-    logmsg(i18n("getVehicleBoneEntity step: %s", cfg.step), "debug")
+    if not cfg then cfg = { step = 0.1, stop = 5 } end
     for k, v in pairs(Config.VehicleBones) do
         local boneIndex = GetEntityBoneIndexByName(entity, v)-- Obtenir l'index du bone par son nom
         if getBoneEntity(coords, entity, boneIndex, cfg.step) then
-            logmsg(i18n("Bone found: %s", v), "info")
             return boneIndex, v
         end
     end
-    if cfg.step > cfg.stop then
-        return nil
-    end
+    if cfg.step > cfg.stop then return nil end
     cfg.step = cfg.step + 0.1
     return getVehicleBoneEntity(coords, entity, cfg)
 end

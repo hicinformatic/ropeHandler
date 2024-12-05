@@ -15,18 +15,32 @@ body {
     border-radius: 10px;
     text-align: center;
     display: none;
+    min-width: 400px;
+}
+
+div.divbutton {
+    border-radius: 5px;
+    background: #555;
+    display: flex;
+    margin: 10px auto;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    overflow: hidden;
 }
 
 button {
-    display: block;
-    margin: 10px auto;
+    background-color: transparent;
+    width: 100%;
     padding: 10px 20px;
     font-size: 16px;
     color: white;
-    background: #555;
     border: none;
-    border-radius: 5px;
     cursor: pointer;
+}
+
+button:nth-child(2) {
+    border-left: 1px solid #777;
 }
 
 button:hover {
@@ -34,5 +48,28 @@ button:hover {
 }
 
 button.selected {
-    background: green;
+    background: rgb(31, 158, 31);
+}
+
+div.separator {
+    margin: 10px auto;
+    width: 100%;
+    height: 1px;
+    background: #777;
+}
+
+div.divbutton.clean {
+    background-color: rgb(17, 76, 143);
+}
+
+div.divbutton.clean button:hover {
+    background-color: rgb(12, 98, 197);
+}
+
+div.divbutton.close {
+    background-color: rgb(133, 24, 24);
+}
+
+div.divbutton.close button:hover {
+    background-color: rgb(177, 33, 33);
 }

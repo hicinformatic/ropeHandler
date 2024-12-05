@@ -1,12 +1,20 @@
 let menuLoaded = false;
 let ropeActive = false;
 let ropesEl = {};
+let invInput;
+let invData = false;
+let commands = {};
+let ropes = {};
+
+function invincible() {
+
+}
 
 function activeOption(option) {
     if (ropeActive && ropesEl[ropeActive]) {
         ropesEl[ropeActive].classList.remove("selected");
     }
-    if (option != "clean" && option != "close") {
+    if (option && option != "clean" && option != "close") {
         ropeActive = option;
         ropesEl[option].classList.add("selected");
     } else {
@@ -14,60 +22,96 @@ function activeOption(option) {
     }
 }
 
-function selectOption(option) {
+function selectOption(option, skin, invincible) {
+    let data = JSON.stringify((option in commands) ? { option } : { option, skin, invincible: invData });
     fetch(`https://ropehandler/selectOption`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', },
-        body: JSON.stringify({ option }),
+        body: data,
     }).then(() => {
-        activeOption(option);
+        activeOption(skin ? option+"_skin" : option);
     });
 }
 
-// Fonction pour charger les traductions
-function loadLanguage(lang) {
-    var script = document.createElement('script');
-    script.src = `./i18n/${lang}.js`;
-    script.type = 'text/javascript';
-    script.async = false; // Important pour bloquer l'exécution du script jusqu'à ce qu'il soit chargé
-    script.defer = false; // Peut être ignoré si async = false
-    document.body.appendChild(script);
-}
-
-function loadMenu(ropes, commands) {
+function loadMenu(ropes, commands, invincibleLang, choiceOption, withSkin) {
     var menu = document.getElementById("menu");
-    ropes.forEach((rope) => {
-        var button = document.createElement("button");
-        button.innerHTML = rope.lang;
-        button.onclick = () => selectOption(rope.name);
-        menu.appendChild(button);
-        ropesEl[rope.name] = button;
-    });
-    var separator = document.createElement("hr");
+
+    var h1 = document.createElement("h1");
+    h1.innerHTML = choiceOption;
+    menu.appendChild(h1);
+
+    var separator = document.createElement("div");
+    separator.classList.add("separator");
     menu.appendChild(separator);
-    commands.forEach((command) => {
-        if(command.name != "ui") {
+
+    label = document.createElement("label");
+    invInput = document.createElement("input");
+    invInput.type = "checkbox";
+    invInput.onchange = () => {
+        invData = !invData;
+        invInput.checked = invData;
+    };
+    invInput.checked = invData;
+    label.appendChild(invInput);
+    label.appendChild(document.createTextNode(invincibleLang));
+    menu.appendChild(label);
+
+    for (const [key, value] of Object.entries(ropes)) {
+        var divbutton = document.createElement("div");
+        divbutton.classList.add("divbutton");
+        var button = document.createElement("button");
+        button.innerHTML = value.lang;
+        button.onclick = () => selectOption(key);
+        divbutton.appendChild(button);
+        divbutton.classList.add("rope");
+        divbutton.classList.add(key);
+        ropesEl[key] = button;
+        if (value.skin) {
             var button = document.createElement("button");
-            button.innerHTML = command.lang;
-            button.onclick = () => selectOption(command.name);
-            menu.appendChild(button);
+            button.innerHTML = withSkin;
+            button.onclick = () => selectOption(key, value.skin);
+            divbutton.appendChild(button);
+            ropesEl[key+"_skin"] = button;
         }
-    });
+        menu.appendChild(divbutton);
+    }
+
+    separator = document.createElement("div");
+    separator.classList.add("separator");
+    menu.appendChild(separator);
+
+    for (const [key, value] of Object.entries(commands)) {
+        if(value.name != "ui") {
+            var divbutton = document.createElement("div");
+            divbutton.classList.add("divbutton");
+            divbutton.classList.add("command");
+            divbutton.classList.add(key);
+            var button = document.createElement("button");
+            button.innerHTML = value.lang;
+            button.onclick = () => selectOption(value.name);
+            divbutton.appendChild(button);
+            menu.appendChild(divbutton);
+        }
+    }
     menuLoaded = true;
 }
 
 // Gestion des événements envoyés par Lua
 window.addEventListener("message", (event) => {
     const data = event.data;
-    loadLanguage(data.lang);
+    commands = data.commands;
+    ropes = data.ropes;
     if (data.action === "openui") {
-        if (!menuLoaded) {
-            console.log(data.commands);
-            loadMenu(data.ropes, data.commands);
-        }
-        if (data.active) {
-            activeOption(data.active);
-        }
+        invincible(data.invincible);
+        if (!menuLoaded)
+            loadMenu(
+                data.ropes,
+                data.commands,
+                data.invincibleLang,
+                data.choiceOption,
+                data.withSkin
+            );
+        activeOption(data.active);
         document.getElementById("menu").style.display = "block";
     } else if (data.action === "closeui") {
         document.getElementById("menu").style.display = "none";

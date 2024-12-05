@@ -15,9 +15,11 @@ langfr = {
     ["Resource stopped"] = "Ressource arrêtée",
     ["Resource started"] = "Ressource démarrée",
     ["Grapplinghook"] = "Grappin manuel",
-    ["Lasso"] = "Lasso",
+    ["Spiderman"] = "Spiderman",
     ["User interface"] = "Interface utilisateur",
     ["Clean"] = "Nettoyer",
     ["Close"] = "Fermer",
     ["Help"] = "Aide",
+    ["With skin"] = "Avec skin",
+
 }

@@ -14,14 +14,31 @@ Config.ColorsMsg = {
 }
 
 Config.Commands = {
-    "ui",
-    "clean",
-    "close",
+    ui = {
+        name = "ui",
+        lang = "UI",
+    },
+    clean = {
+        name = "clean",
+        lang = "Clean",
+    },
+    close = {
+        name = "close",
+        lang = "Close",
+    },
 }
 
 Config.Ropes = {
-    "grapplinghook",
-    "spiderman",
+    grapplinghook = {
+        name = "grapplinghook",
+        lang = "Grapplinghook",
+        skin = "IndianaJones1"
+    },
+    spiderman = {
+        name = "spiderman",
+        lang = "Spiderman",
+        skin = "SpiderMan2002"
+    },
 }
 
 Config.PedBones = {

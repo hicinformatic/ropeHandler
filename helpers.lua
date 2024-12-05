@@ -1,5 +1,5 @@
 i18nload = nil
-peds_used = {}
+entities_ropable = {}
 vehicles_used = {}
 
 -- Func to log messages in console
@@ -38,8 +38,6 @@ end
 function setLang(lang)
     if _G["lang" .. lang] then
         i18nload = _G["lang" .. lang]
-    else
-        logger("Language not found: " .. lang, "error")
     end
 end
 
@@ -61,7 +59,6 @@ end
 
 -- Func to get the index of a bone by name
 function getBoneIndexByName(boneName)
-    logger("getBoneIndexByName: " .. boneName, "debug")
     return Config.PedBones[boneName]
 end
 
@@ -80,12 +77,14 @@ function getEntityTypeFormat(entity, format)
     return format == "string" and "coords" or 0
 end
 
+-- Func to disable controls
 function disableControls(controls)
     for _, control in ipairs(controls) do
         DisableControlAction(0, control, true)
     end
 end
 
+-- Func to check if an entity is in a list of types
 function isEntityInTypes(entity, types)
     for _, t in ipairs(types) do
         if getEntityTypeFormat(entity) == t then
@@ -95,6 +94,16 @@ function isEntityInTypes(entity, types)
     return false
 end
 
+-- Func to get keys from a table
+function getKeys(tbl)
+    local keys = {}
+    for k, _ in pairs(tbl) do
+        table.insert(keys, k)
+    end
+    return keys
+end
+
+-- Func to get a config value
 function getCfg(cfg, key, default)
     if cfg and cfg[key] then
         return cfg[key]
@@ -102,6 +111,7 @@ function getCfg(cfg, key, default)
     return default or nil
 end
 
+-- Func to get coords from bone ped or vehicle
 function getCoordsEntity(entity, cfg)
     if cfg and cfg.bonePed then
         local boneIndex = GetPedBoneIndex(entity, getBoneIndexByName(cfg.bonePed))
@@ -113,17 +123,41 @@ function getCoordsEntity(entity, cfg)
     return GetEntityCoords(entity)
 end
 
-function setRopablePed(ped)
-    SetEntityInvincible(ped, true) -- Assurez-vous qu'il n'est pas invincible
-    table.insert(peds_used, ped)
+-- Func to set an entity as invincible
+function setRopableEntity(entity)
+    SetEntityInvincible(entity, true) -- Assurez-vous qu'il n'est pas invincible
+    table.insert(entities_ropable, entity)
 end
 
-function unsetRopablePed(ped)
-    SetEntityInvincible(ped, false) -- Désactiver l'invincibilité
+-- Func to unset an entity as invincible
+function unsetRopableEntity(entity)
+    SetEntityInvincible(entity, false) -- Désactiver l'invincibilité
 end
 
+-- Func to unset all entities as invincible
 function unsetRopablePeds()
-    for _, ped in ipairs(peds_used) do
-        unsetRopablePed(ped)
+    for _, entity in ipairs(entities_ropable) do
+        unsetRopableEntity(entity)
+    end
+end
+
+-- Func to load a skin on a ped
+function loadSkinPed(ped, skin)
+    logmsg(i18n("Loading skin: %s", skin), "info")
+    local model = GetHashKey(skin)
+    RequestModel(model)
+    while not HasModelLoaded(model) do
+        Citizen.Wait(0)
+    end
+    SetPlayerModel(PlayerId(), model)
+    SetModelAsNoLongerNeeded(model)
+end
+
+-- Func to display the help message
+function help()
+    chatmsg(i18n("Usage: /ropehook [ropetype]"), "info")
+    chatmsg(i18n("Available ropetypes:"), "info")
+    for k, v in pairs(getKeys(Config.Commands)) do
+        chatmsg(i18n("%d. %s", k, v), "info")
     end
 end

@@ -55,21 +55,3 @@ function moveEntityDynToEntityDyn(mode, from, to, cfg)
     ApplyForceToEntity(from, 1, directionFrom.x * force, directionFrom.y * force, directionFrom.z * force, 0, 0, 0, 0, false, true, true, false, true)
     ApplyForceToEntity(to, 1, directionTo.x * force, directionTo.y * force, directionTo.z * force, 0, 0, 0, 0, false, true, true, false, true)
 end
-
-
-
-function pullEntityWithCoords(from, to, cfg)
-    local fromPos = GetEntityCoords(from)
-    local toPos = GetEntityCoords(to)
-    local distance = #(fromPos - toPos)
-    if distance < 1.0 then return end
-    -- Calculer la direction et la force de traction
-    local direction = (toPos - fromPos) / distance
-    local force = cfg.step or 0.1 -- Ajustez la force selon vos besoins
-    -- Appliquer la force au personnage
-    ApplyForceToEntity(from, 1, direction.x * force, direction.y * force, direction.z * force, 0, 0, 0, 0, false, true, true, false, true)
-    --if cfg.rope then
-    --    -- Mettre à jour la longueur de la corde
-    --    SetRopeLength(cfg.rope, distance)
-    --end
-end

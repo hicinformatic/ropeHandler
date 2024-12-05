@@ -8,13 +8,6 @@ version "v1.0"
 
 ui_page 'html/index.html'
 
-files {
-    "html/index.html",
-    "html/script.js",
-    "html/style.css",
-    "html/i18n/fr.js",
-}
-
 client_scripts {
     'i18n/fr.lua',
     'config.lua',
@@ -32,3 +25,17 @@ client_scripts {
     'ropes/spiderman/init.lua',
     'client.lua',
 }
+
+files {
+    "html/index.html",
+    "html/script.js",
+    "html/style.css",
+    'stream/*.yft',
+    'stream/*.ytd',
+    'stream/*.ymt',
+    'stream/*.yft',
+    'stream/*.meta'
+}
+
+data_file 'PED_METADATA_FILE' 'stream/IndianaJones1.meta'
+data_file 'PED_METADATA_FILE' 'stream/SpiderMan2002.meta'

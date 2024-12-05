@@ -1,12 +1,19 @@
 -- Callback pour gérer les options sélectionnées
 RegisterNUICallback("selectOption", function(data, cb)
-    logger(i18n("Option selected : " .. data.option), "debug")
     closeInit()
-    RopeHandlerStart(data.option)
+    if data.skin then
+        logger(i18n("Skin selected : " .. data.skin), "debug")
+    end
+    logmsg("invincible: " .. tostring(data.invincible), "debug")
+    RopeHandlerStart(data.option, data.skin, data.invincible)
     cb("ok")
 end)
 
 function cleanInit()
+    if load_skin then
+        loadSkinPed(PlayerPedId(), base_skin)
+        load_skin = false
+    end
     RopeHandlerStop()
 end
 
@@ -16,39 +23,31 @@ function closeInit()
 end
 
 function uiInit()
-    optslang = {
-        grapplinghook = i18n("Grapplinghook"),
-        spiderman = i18n("Spiderman"),
-        user = i18n("User interface"),
-        clean = i18n("Clean"),
-        close = i18n("Close"),
-        help = i18n("Help"),
-    }
-
     ropes = {}
     for k, v in pairs(Config.Ropes) do
-        ropes[k] = {
-            name = v,
-            lang = optslang[v],
-        }
+        ropes[k] = { name = v.name, lang = i18n(v.lang), skin = v.skin, }
     end
 
     commands = {}
     for k, v in pairs(Config.Commands) do
-        commands[k] = {
-            name = v,
-            lang = optslang[v],
-        }
+        commands[k] = { name = v.name, lang = i18n(v.lang), }
     end
 
-    chatmsg("UI initialized", "debug")
-    chatmsg(Config.Commands, "debug")
+    local active = current_usage
+    if load_skin and active then
+        active = active .. "_skin"
+    end
+
     SetNuiFocus(true, true)
     SendNUIMessage({
         action = "openui",
         ropes = ropes,
         commands = commands,
-        active = current_usage.mode,
+        active = active,
+        invincible = invincible,
+        invincibleLang = i18n("Enable invincibility"),
+        withSkin = i18n("With skin"),
+        choiceOption = i18n("Choice an option"),
         lang = Config.DefaultLang,
     })
 end

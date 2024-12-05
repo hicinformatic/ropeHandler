@@ -42,14 +42,14 @@ spidermanConfig.items = {
         model = "prop_golf_ball",
         bonePed = "SKEL_R_Hand",
         offset = vector3(0.1, 0.01, 0.0),
-        --invisible = true,
+        invisible = true,
         itemname = "ghrighthand",
     },
     lefthand = {
         model = "prop_golf_ball",
         bonePed = "SKEL_L_Hand",
         offset = vector3(0.1, -0.01, 0.0),
-        --invisible = true,
+        invisible = true,
         itemname = "ghlefthand",
     },
     pelvis = {
@@ -66,4 +66,19 @@ spidermanConfig.crosshair = {
     crosshaireName = "hud_dest",
     colorOff = {128, 128, 128, 125},
     colorOn = {255, 255, 255, 255},
+}
+
+spidermanConfig.animations = {
+    throw = {
+        dict = "weapons@projectile@",
+        name = "throw_m_fb_stand",
+        duration = 450,
+        wait = true,
+    },
+    unthrow = {
+        dict = "weapons@projectile@",
+        name = "static_drop",
+        duration = 500,
+        wait = true,
+    },
 }

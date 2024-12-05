@@ -1,3 +1,0 @@
-var langfr = {
-    "test": "toto",
-}

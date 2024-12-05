@@ -1,77 +1,53 @@
-current_usage = {
-    throwed = {},
-    mode = nil,
-}
-last_mode = nil
+current_usage = nil
+base_skin = nil
+load_skin = nil
+is_dead = nil
+is_dead_stop = false
+is_unique_thrown = nil
+is_multiple_thrown = {}
+invicible = false
 
-local function help()
-    chatmsg(i18n("Usage: /ropehook [ropetype]"), "info")
-    chatmsg(i18n("Available ropetypes:"), "info")
-    for k, v in pairs(Config.Commands) do
-        chatmsg(i18n("%d. %s", k, v), "info")
-    end
-end
-
-local function PrepareUsage()
-    current_usage = {
-        throwed = {},
-        mode = nil,
-    }
-end
-
-local function CanStart(mode)
-    logger(i18n("CanStart: %s", mode), "debug")
-    logger(i18n("current_usage.mode: %s", current_usage.mode), "debug")
-    if current_usage.mode ~= nil and current_usage.mode == mode then
-        return false
-    end
-    return true
-end
-
-function IsThrowed()
-    return #current_usage.throwed > 0
-end
-
-function RopeHandlerStart(mode)
+function RopeHandlerStart(mode, skin, invincible)
     logger(i18n("Command /ropehandler called: %s", mode), "debug")
-    if isStringInArray(Config.Ropes, mode) then
-        logger(i18n("Rope type enabled: %s", mode), "debug")
-        if CanStart(mode) then
+    if isStringInArray(getKeys(Config.Ropes), mode) then
+        if current_usage then
             RopeHandlerStop()
-            current_usage = {mode = mode or args[1]}
-            last_mode = mode
-            logger(i18n("Current usage mode: %s", current_usage.mode), "debug")
-            _G[current_usage.mode .. "Init"]()
-        else
-            logger(i18n("Rope type already enabled: %s", mode), "debug")
         end
-    elseif isStringInArray(Config.Commands, mode) then
-        logger(i18n("Command launched: %s", mode), "debug")
+        current_usage = mode
+        if skin then
+            load_skin = true
+            loadSkinPed(ped, skin)
+        end
+        load_skin = skin or false
+        SetEntityInvincible(PlayerPedId(), invincible or false)
+        _G[current_usage .. "Init"]()
+    elseif isStringInArray(getKeys(Config.Commands), mode) then
         _G[mode .. "Init"]()
     else
         logger(i18n("Invalid ropetype: %s", mode), "debug")
         help()
-        return
     end
 end
 
-function RopeHandlerStop()
-    removeItems(items_loaded)
+function RopeHandlerStop(cfg)
+    logger(i18n("Rope stopping"), "debug")
     removeRopes(ropes_loaded)
+    removeItems(items_loaded)
     unsetRopablePeds(peds_used)
     items_loaded = {}
     items_named = {}
     ropes_loaded = {}
     ropes_named = {}
-    PrepareUsage()
-end
-
-function RopeHandlerRestart()
-    RopeHandlerStop()
-    RopeHandlerStart(last_mode)
+    current_usage = nil
+    is_unique_thrown = nil
+    is_multiple_thrown = {}
+    logger(i18n("Rope stopped"), "debug")
 end
 
 RegisterCommand('ropehandler', function(source, args, rawCommand)
+    if not base_skin then
+        base_skin = GetEntityArchetypeName(PlayerPedId())
+    end
     setLang(Config.DefaultLang)
     RopeHandlerStart(args[1] or "ui")
 end, false)
@@ -79,16 +55,15 @@ end, false)
 Citizen.CreateThread(function()
      while true do
         Citizen.Wait(0)
-        local isDead = IsEntityDead(PlayerPedId())
-        if isDead then
+        is_dead = IsEntityDead(PlayerPedId())
+        if is_dead and not is_dead_stop then
             chatmsg(i18n("You are dead !"), "info")
             RopeHandlerStop()
-            while IsEntityDead(playerPed) do
-                Citizen.Wait(1000)
-            end
-        elseif current_usage.mode and isStringInArray(Config.Ropes, current_usage.mode) then
-            -- Enable the rope mode
-            _G[current_usage.mode .. "Thread"]()
+            Citizen.Wait(1000)
+            is_dead_stop = true
+        elseif current_usage and isStringInArray(getKeys(Config.Ropes), current_usage) then
+            is_dead_stop = false
+            _G[current_usage .. "Thread"]()
         end
     end
 end)
@@ -109,6 +84,6 @@ end)
 
 -- Optionnel : Supprimer l'objet lorsque le joueur quitte le serveur
 AddEventHandler('playerDropped', function()
-    logmsg("Resource stopped", "debug")
+    logmsg("Player dropped", "debug")
     RopeHandlerStop()
 end)
