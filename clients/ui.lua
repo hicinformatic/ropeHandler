@@ -1,10 +1,6 @@
 -- Callback pour gérer les options sélectionnées
 RegisterNUICallback("selectOption", function(data, cb)
     closeInit()
-    if data.skin then
-        logger(i18n("Skin selected : " .. data.skin), "debug")
-    end
-    logmsg("invincible: " .. tostring(data.invincible), "debug")
     RopeHandlerStart(data.option, data.skin, data.invincible)
     cb("ok")
 end)
