@@ -7,6 +7,7 @@ is_unique_thrown = nil
 is_multiple_thrown = {}
 invicible = false
 
+-- Func to start the rope
 function RopeHandlerStart(mode, skin, invincible)
     logger(i18n("Command /ropehandler called: %s", mode), "debug")
     if isStringInArray(getKeys(Config.Ropes), mode) then
@@ -29,6 +30,7 @@ function RopeHandlerStart(mode, skin, invincible)
     end
 end
 
+-- Func to stop the rope
 function RopeHandlerStop(cfg)
     logger(i18n("Rope stopping"), "debug")
     removeRopes(ropes_loaded)

@@ -23,6 +23,14 @@ client_scripts {
     'ropes/grapplinghook/init.lua',
     'ropes/spiderman/config.lua',
     'ropes/spiderman/init.lua',
+    'ropes/venom/init.lua',
+    'ropes/venom/config.lua',
+    'ropes/whip/init.lua',
+    'ropes/whip/config.lua',
+    'ropes/prototype/init.lua',
+    'ropes/prototype/config.lua',
+    'ropes/justcause/init.lua',
+    'ropes/justcause/config.lua',
     'client.lua',
 }
 
@@ -37,5 +45,9 @@ files {
     'stream/*.meta'
 }
 
+
 data_file 'PED_METADATA_FILE' 'stream/IndianaJones1.meta'
 data_file 'PED_METADATA_FILE' 'stream/SpiderMan2002.meta'
+data_file 'PED_METADATA_FILE' 'stream/Venom.meta'
+data_file 'PED_METADATA_FILE' 'stream/NathanDrake.meta'
+data_file 'PED_METADATA_FILE' 'stream/alex_claws.meta'
