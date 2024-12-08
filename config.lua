@@ -29,6 +29,11 @@ Config.Commands = {
 }
 
 Config.Ropes = {
+    bungeejumping = {
+        name = "bungeejumping",
+        lang = "Bungee Jumping",
+        skin = "A_M_Y_Surfer_01",
+    },
     grapplinghook = {
         name = "grapplinghook",
         lang = "Grapplinghook",
@@ -58,6 +63,14 @@ Config.Ropes = {
         name = "whip",
         lang = "Whip",
         skin = "IndianaJones1"
+    },
+}
+
+Config.Tools = {
+    measure = {
+        name = "measure",
+        lang = "Measure",
+        skin = "S_M_Y_Construct_02",
     },
 }
 

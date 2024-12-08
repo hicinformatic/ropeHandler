@@ -10,7 +10,7 @@ invicible = false
 -- Func to start the rope
 function RopeHandlerStart(mode, skin, invincible)
     logger(i18n("Command /ropehandler called: %s", mode), "debug")
-    if isStringInArray(getKeys(Config.Ropes), mode) then
+    if isStringInArray(getKeys(Config.Ropes), mode) or isStringInArray(getKeys(Config.Tools), mode) then
         if current_usage then
             RopeHandlerStop()
         end
@@ -35,6 +35,7 @@ function RopeHandlerStop(cfg)
     logger(i18n("Rope stopping"), "debug")
     removeRopes(ropes_loaded)
     removeItems(items_loaded)
+    removeWeapons(weapons_loaded)
     unsetRopablePeds(peds_used)
     items_loaded = {}
     items_named = {}
@@ -64,6 +65,9 @@ Citizen.CreateThread(function()
             Citizen.Wait(1000)
             is_dead_stop = true
         elseif current_usage and isStringInArray(getKeys(Config.Ropes), current_usage) then
+            is_dead_stop = false
+            _G[current_usage .. "Thread"]()
+        elseif current_usage and isStringInArray(getKeys(Config.Tools), current_usage) then
             is_dead_stop = false
             _G[current_usage .. "Thread"]()
         end

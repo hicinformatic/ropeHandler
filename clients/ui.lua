@@ -24,6 +24,11 @@ function uiInit()
         ropes[k] = { name = v.name, lang = i18n(v.lang), skin = v.skin, }
     end
 
+    tools = {}
+    for k, v in pairs(Config.Tools) do
+        tools[k] = { name = v.name, lang = i18n(v.lang), skin = v.skin, }
+    end
+
     commands = {}
     for k, v in pairs(Config.Commands) do
         commands[k] = { name = v.name, lang = i18n(v.lang), }
@@ -38,12 +43,14 @@ function uiInit()
     SendNUIMessage({
         action = "openui",
         ropes = ropes,
+        tools = tools,
         commands = commands,
         active = active,
         invincible = invincible,
         invincibleLang = i18n("Enable invincibility"),
         withSkin = i18n("With skin"),
-        choiceOption = i18n("Choice an option"),
+        choiceOption = i18n("Choice a rope"),
+        choiceTool = i18n("Choice a tool"),
         lang = Config.DefaultLang,
     })
 end

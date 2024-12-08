@@ -43,7 +43,7 @@ end
 
 -- Func to translate messages
 function i18n(message, ...)
-    message = i18nload[message] or message
+    message = i18nload and i18nload[message] or message
     return string.format(message, ...)
 end
 
