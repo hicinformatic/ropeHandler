@@ -9,7 +9,9 @@ version "v1.0"
 ui_page 'html/index.html'
 
 client_scripts {
+    -- Languages
     'i18n/fr.lua',
+    -- Global
     'config.lua',
     'helpers.lua',
     'clients/aim.lua',
@@ -24,16 +26,16 @@ client_scripts {
     'ropes/bungeejumping/init.lua',
     'ropes/grapplinghook/config.lua',
     'ropes/grapplinghook/init.lua',
+    'ropes/justcause/config.lua',
+    'ropes/justcause/init.lua',
+    'ropes/prototype/config.lua',
+    'ropes/prototype/init.lua',
     'ropes/spiderman/config.lua',
     'ropes/spiderman/init.lua',
     'ropes/venom/config.lua',
     'ropes/venom/init.lua',
     'ropes/whip/config.lua',
     'ropes/whip/init.lua',
-    'ropes/prototype/config.lua',
-    'ropes/prototype/init.lua',
-    'ropes/justcause/config.lua',
-    'ropes/justcause/init.lua',
     -- Tools
     'tools/measure/init.lua',
     'tools/measure/config.lua',
