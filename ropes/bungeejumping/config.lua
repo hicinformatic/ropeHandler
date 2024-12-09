@@ -1,6 +1,6 @@
 bungeejumpingConfig = {
     distance = 50.0,
-    ropedefault = 50.0,
+    ropedefault = 10.0,
     controls = {
         37, -- tab
         24, -- leftClick
@@ -8,6 +8,7 @@ bungeejumpingConfig = {
         25, -- rightClick
         96, -- scrollUp
         97, -- scrollDown
+        22, -- space
     }
 }
 
@@ -26,8 +27,8 @@ bungeejumpingConfig.items = {
         rotation = vector3(0.0, -50.0, 180.0),
         --maxLength = 1.5,
         noCollision = true,
-        itemname = "item_rope",
-        ropename = "rope_rope",
+        itemname = "item_hook",
+        ropename = "rope_hook",
     },
     righthand = {
         model = "prop_golf_ball",

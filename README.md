@@ -4,19 +4,25 @@
 
 "/ropehandler" to open the UI and select a rope type. You can also choose a skin adapted if desired and enable invincibility.
 
-Alternatively, you can type "/ropehandler [ropetype]" directly.
+Alternatively, you can type "/ropehandler [ropetype|tooltype]" directly.
 
 ## Rope Type
 
 | Ropetype      | Client Progress | Server Progress |
 |:------------- | :--------------:| ---------------:|
+| bungeejumping | 50%             | 0%              |
 | grapplinghook | 90%             | 0%              |
 | justcause     | 0%              | 0%              |
 | prototype     | 30%             | 0%              |
 | spiderman     | 80%             | 0%              |
 | venom         | 30%             | 0%              |
-| whip          | 80%             | 0%              |
+| whip          | 50%             | 0%              |
 
+## Tool Type
+
+| Tooltype      | Client Progress | Server Progress |
+|:------------- | :--------------:| ---------------:|
+| measure       | 100%            | 0%              |
 
 # Credits to
 
@@ -41,6 +47,11 @@ Patreon: https://www.patreon.com/ThunderWolfUE
 Barak101 -> Skin Alex mercer (prototype)
 https://www.gta5-mods.com/player/alex-mercer-from-prototype-ped-add-on
 Patreon: https://www.patreon.com/Barak101
+
+TheMadBreaker -> Batman grappling
+https://www.gta5-mods.com/weapons/bak-gadgets-pack-i
+Youtube: https://www.youtube.com/channel/UCjC3G2sZ9S63t_wOOFBQdPQ
+Patreon: https://www.patreon.com/TheMadBreaker
 
 # Special thanks
 

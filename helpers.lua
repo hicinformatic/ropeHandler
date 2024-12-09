@@ -143,7 +143,7 @@ end
 
 -- Func to load a skin on a ped
 function loadSkinPed(ped, skin)
-    logmsg(i18n("Loading skin: %s", skin), "info")
+    logger(i18n("Loading skin: %s", skin), "info")
     local model = GetHashKey(skin)
     RequestModel(model)
     while not HasModelLoaded(model) do

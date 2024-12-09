@@ -14,12 +14,20 @@ langfr = {
     ["Player dropped"] = "Joueur déconnecté",
     ["Resource stopped"] = "Ressource arrêtée",
     ["Resource started"] = "Ressource démarrée",
+    -- Errors
+    ["Error: %s"] = "Erreur: %s",
+    ["Warning: %s"] = "Avertissement: %s",
+    ["Info: %s"] = "Info: %s",
+    -- Ropes
+    ["With skin"] = "Avec skin",
     ["Grapplinghook"] = "Grappin manuel",
     ["Spiderman"] = "Spiderman",
+    ["Bungee Jumping"] = "Saut à l'élastique",
     ["User interface"] = "Interface utilisateur",
+    -- Tools
+    ["Measure device"] = "Appareil de mesure",
+    -- Commands
     ["Clean"] = "Nettoyer",
     ["Close"] = "Fermer",
     ["Help"] = "Aide",
-    ["With skin"] = "Avec skin",
-
 }

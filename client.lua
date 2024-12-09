@@ -21,9 +21,9 @@ function RopeHandlerStart(mode, skin, invincible)
         end
         load_skin = skin or false
         SetEntityInvincible(PlayerPedId(), invincible or false)
-        _G[current_usage .. "Init"]()
+        StartInitOrThread(current_usage, "Init")
     elseif isStringInArray(getKeys(Config.Commands), mode) then
-        _G[mode .. "Init"]()
+        StartInitOrThread(mode, "Init")
     else
         logger(i18n("Invalid ropetype: %s", mode), "debug")
         help()
@@ -55,6 +55,12 @@ RegisterCommand('ropehandler', function(source, args, rawCommand)
     RopeHandlerStart(args[1] or "ui")
 end, false)
 
+function StartInitOrThread(mode, method)
+    if _G[mode .. method] then
+        _G[mode .. method]()
+    end
+end
+
 Citizen.CreateThread(function()
      while true do
         Citizen.Wait(0)
@@ -66,10 +72,10 @@ Citizen.CreateThread(function()
             is_dead_stop = true
         elseif current_usage and isStringInArray(getKeys(Config.Ropes), current_usage) then
             is_dead_stop = false
-            _G[current_usage .. "Thread"]()
+            StartInitOrThread(current_usage, "Thread")
         elseif current_usage and isStringInArray(getKeys(Config.Tools), current_usage) then
             is_dead_stop = false
-            _G[current_usage .. "Thread"]()
+            StartInitOrThread(current_usage, "Thread")
         end
     end
 end)

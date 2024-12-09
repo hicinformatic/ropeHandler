@@ -69,7 +69,7 @@ Config.Ropes = {
 Config.Tools = {
     measure = {
         name = "measure",
-        lang = "Measure",
+        lang = "Measure device",
         skin = "S_M_Y_Construct_02",
     },
 }
