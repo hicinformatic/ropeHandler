@@ -2,7 +2,7 @@
 
 ## Youtube demo
 
-https://youtu.be/nTQUwghvy5Q
+[https://youtu.be/nTQUwghvy5Q](https://www.youtube.com/watch?v=JlshVLIkCq8)
 
 ## How to start
 
