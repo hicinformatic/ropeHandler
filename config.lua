@@ -37,32 +37,32 @@ Config.Ropes = {
     grapplinghook = {
         name = "grapplinghook",
         lang = "Grapplinghook",
-        skin = "NathanDrake"
+        --skin = "NathanDrake"
     },
     justcause = {
         name = "justcause",
         lang = "Just Cause",
-        skin = "IndianaJones1"
+        --skin = "IndianaJones1"
     },
     prototype = {
         name = "prototype",
         lang = "Prototype",
-        skin = "alex_claws"
+        --skin = "alex_claws"
     },
     spiderman = {
         name = "spiderman",
         lang = "Spiderman",
-        skin = "SpiderMan2002"
+        --skin = "SpiderMan2002"
     },
     venom = {
         name = "venom",
         lang = "Venom",
-        skin = "Venom"
+        --skin = "Venom"
     },
     whip = {
         name = "whip",
         lang = "Whip",
-        skin = "IndianaJones1"
+        --skin = "IndianaJones1"
     },
 }
 
