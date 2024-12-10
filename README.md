@@ -36,6 +36,8 @@ Alternatively, you can type "/ropehandler [ropetype|tooltype]" directly.
 
 # Credits to
 
+I used skins of well-known fictional characters for my beta, but I have since removed them. However, you can still see them in the video of the beta version.
+
 MAESTRE, DoctorMike, Barak101
 - Skin Nathan Drake
 - https://www.gta5-mods.com/player/nathan-drake-from-uncharted-3
@@ -77,14 +79,14 @@ Textures https://wiki.rage.mp/index.php?title=Textures
 
 ## Threads
 
-https://forum.cfx.re/t/disable-weapon-wheel/124831/3
-https://forum.cfx.re/t/is-there-a-native-function-or-a-method-to-get-the-entity-the-player-is-looking-at/4798439/2
-https://forum.cfx.re/t/get-position-where-player-is-aiming/1903886
-https://forum.cfx.re/t/get-camera-coordinates/183555
-https://forum.cfx.re/t/attachentitytorope/4850292
-https://forum.cfx.re/t/sync-rope-between-players/1171694/2
-https://forum.cfx.re/t/how-to-get-where-the-player-is-aiming/5008166/2
-https://forum.cfx.re/t/solved-how-do-you-get-screen-coords-from-world-coords/2168791
+- https://forum.cfx.re/t/disable-weapon-wheel/124831/3
+- https://forum.cfx.re/t/is-there-a-native-function-or-a-method-to-get-the-entity-the-player-is-looking-at/4798439/2
+- https://forum.cfx.re/t/get-position-where-player-is-aiming/1903886
+- https://forum.cfx.re/t/get-camera-coordinates/183555
+- https://forum.cfx.re/t/attachentitytorope/4850292
+- https://forum.cfx.re/t/sync-rope-between-players/1171694/2
+- https://forum.cfx.re/t/how-to-get-where-the-player-is-aiming/5008166/2
+- https://forum.cfx.re/t/solved-how-do-you-get-screen-coords-from-world-coords/2168791
 
 # Next step
 
