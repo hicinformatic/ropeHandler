@@ -1,4 +1,4 @@
-justcauseConfig = {
+testConfig = {
     distance = 6000,
     controls = {
         37, -- tab
@@ -10,17 +10,17 @@ justcauseConfig = {
     }
 }
 
-justcauseConfig.items = {
-    raygun = {
-        model = "WEAPON_RAYPISTOL",
+testConfig.items = {
+    scanner = {
+        model = "WEAPON_DIGISCANNER", --WEAPON_HACKINGDEVICE
     },
 }
 
-justcauseConfig.animations = {
+testConfig.animations = {
 
 }
 
-justcauseConfig.crosshair = {
+testConfig.crosshair = {
     showLine = true,
     colorLine = { 255, 0, 0, 255 },
     crosshairDict = "helicopterhud",

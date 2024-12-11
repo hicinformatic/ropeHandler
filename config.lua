@@ -37,32 +37,32 @@ Config.Ropes = {
     grapplinghook = {
         name = "grapplinghook",
         lang = "Grapplinghook",
-        --skin = "NathanDrake"
+        skin = "CSB_Req_Officer"
     },
     justcause = {
         name = "justcause",
         lang = "Just Cause",
-        --skin = "IndianaJones1"
+        skin = "S_M_Y_Swat_01"
     },
     prototype = {
         name = "prototype",
         lang = "Prototype",
-        --skin = "alex_claws"
+        skin = "CSB_IslDJ_03"
     },
     spiderman = {
         name = "spiderman",
         lang = "Spiderman",
-        --skin = "SpiderMan2002"
+        skin = "U_M_Y_SmugMech_01"
     },
     venom = {
         name = "venom",
         lang = "Venom",
-        --skin = "Venom"
+        skin = "U_M_Y_FIBMugger_01"
     },
     whip = {
         name = "whip",
         lang = "Whip",
-        --skin = "IndianaJones1"
+        skin = "CSB_Cop"
     },
 }
 
@@ -72,6 +72,11 @@ Config.Tools = {
         lang = "Measure device",
         skin = "S_M_Y_Construct_02",
     },
+    test = {
+        name = "test",
+        lang = "Test device",
+        skin = "U_M_Y_GunVend_01",
+    }
 }
 
 Config.PedBones = {

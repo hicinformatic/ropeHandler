@@ -10,6 +10,10 @@
 
 Alternatively, you can type "/ropehandler [ropetype|tooltype]" directly.
 
+## How to use
+
+Some ropes allow you to adjust their length. Simply use the scroll wheel to increase or decrease the size.
+
 ## Rope Type
 
 | Ropetype      | Client Progress | Server Progress |

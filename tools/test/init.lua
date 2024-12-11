@@ -1,12 +1,12 @@
-function measureInit()
+function testInit()
     local ped = PlayerPedId()
-    addWeaponTo(ped, justcauseConfig.items.raygun.model, justcauseConfig.items.raygun)
+    addWeaponTo(ped, testConfig.items.scanner.model, testConfig.items.scanner)
 end
 
-function measureThread()
-    disableControls(justcauseConfig.controls)
-    local hit, coords, entity = RayCastGamePlayCamera(justcauseConfig.distance)
-    ShowCrosshair(justcauseConfig.crosshair, hit ~= 0)
+function testThread()
+    disableControls(testConfig.controls)
+    local hit, coords, entity = RayCastGamePlayCamera(testConfig.distance)
+    ShowCrosshair(testConfig.crosshair, hit ~= 0)
     if hit ~= 0 and IsDisabledControlJustPressed(0, 24) then
         local ped = PlayerPedId()
         TurnPedToTarget(ped, coords)
